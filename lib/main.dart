@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:scoring/FantastischeReiche.dart';
+import 'package:scoring/fantastischeReiche.dart';
 
-void main() {
+Future<void> main() async {
   runApp(const MyApp());
 }
 
@@ -31,17 +31,15 @@ class MyHomePage extends StatelessWidget {
       children: [
         ListTile(
           title: const Text('Fantastische Reiche'),
-          onTap: (){
+          onTap: () {
             Navigator.of(context).push(
-              MaterialPageRoute<void>(builder: (BuildContext){
+              MaterialPageRoute<void>(builder: (BuildContext) {
                 return FantastischeReiche();
               }),
             );
           },
         )
       ],
-    )
-    );
+    ));
   }
-
 }
