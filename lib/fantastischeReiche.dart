@@ -91,6 +91,7 @@ class HandWidget extends State<FantastischeReiche> {
       ),
       floatingActionButton: Column(mainAxisAlignment: MainAxisAlignment.end, children: [
         FloatingActionButton(
+            heroTag: 'btn1',
             child: const Icon(Icons.camera_alt),
             onPressed: () async {
               // Ensure that plugin services are initialized so that `availableCameras()`
@@ -108,6 +109,7 @@ class HandWidget extends State<FantastischeReiche> {
               }));
             }),
         FloatingActionButton(
+          heroTag: 'btn2',
           child: const Icon(Icons.add),
           onPressed: () async {
             final result = await Navigator.push(

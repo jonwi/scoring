@@ -34,6 +34,9 @@ class Deck {
       int sum = 0;
       sum += 10 * amountOf(activeDeck(deck), {CardType.Army});
       sum -= 5 * amountOf(activeDeck(deck), {CardType.Leader});
+      if (contains(activeDeck(deck), 'Kaiserin')) {
+        sum += 5;
+      }
       return sum;
     }),
     Card('Ritter', CardType.Army, false, 20, (deck) {}, (deck) {
