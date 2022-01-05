@@ -18,7 +18,7 @@ class FantastischeReiche extends StatefulWidget {
 
 class HandWidget extends State<FantastischeReiche> {
   /// Card and Active State where true means the card counts towards total and false means its deactivated
-  final Map<game.Card, bool?> _hand = HashMap<game.Card, bool?>();
+  final Map<game.Card, bool?> _hand = HashMap<game.Card, bool?>(equals: (c1, c2) => c1.name == c2.name);
   int _sum = 0;
 
   @override
@@ -104,9 +104,12 @@ class HandWidget extends State<FantastischeReiche> {
               // Get a specific camera from the list of available cameras.
               final firstCamera = cameras.first;
 
-              await Navigator.push(context, MaterialPageRoute(builder: (context) {
+              var result = await Navigator.push<Set<String>>(context, MaterialPageRoute(builder: (context) {
                 return CameraScan(camera: firstCamera);
               }));
+              result?.forEach((element) {
+                _addCard(element);
+              });
             }),
         FloatingActionButton(
           heroTag: 'btn2',
