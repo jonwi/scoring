@@ -170,7 +170,8 @@ class Deck {
       return 0;
     }),
     Card('Feuerwesen', CardType.Flame, false, 4, (deck) {}, (deck) {
-      return amountOf(activeDeck(deck), {CardType.Flame}) * 15;
+      return amountOf(activeDeck(deck), {CardType.Flame}) * 15 -
+          countNames(activeDeck(deck), 'Feuerwesen') * 15;
     }),
     Card('Quelle des Lebens', CardType.Flood, false, 1, (deck) {}, (deck) {
       var aDeck = activeDeck(deck);
@@ -215,7 +216,8 @@ class Deck {
       return 0;
     }),
     Card('Wasserwesen', CardType.Flood, false, 4, (deck) {}, (deck) {
-      return amountOf(activeDeck(deck), {CardType.Flood}) * 15;
+      return amountOf(activeDeck(deck), {CardType.Flood}) * 15 -
+          countNames(activeDeck(deck), 'Wasserwesen') * 15;
     }),
     Card('Gestaltenwandler', CardType.Wild, true, 0, (deck) {}, (deck) {
       return 0;
@@ -263,7 +265,7 @@ class Deck {
           (contains(activeDeck(deck), 'Waldläufer') ? 12 : 0);
     }),
     Card('Erdwesen', CardType.Land, false, 4, (deck) {}, (deck) {
-      return amountOf(activeDeck(deck), {CardType.Land}) * 15;
+      return amountOf(activeDeck(deck), {CardType.Land}) * 15 - countNames(activeDeck(deck), 'Erdwesen') * 15;
     }),
     Card('Kriegsschiff', CardType.Weapon, false, 23, (deck) {
       if (!deckContainsType(deck, CardType.Flood)) {
@@ -363,7 +365,8 @@ class Deck {
       return 0;
     }),
     Card('Luftwesen', CardType.Weather, false, 4, (deck) {}, (deck) {
-      return amountOf(activeDeck(deck), {CardType.Weather}) * 15;
+      return amountOf(activeDeck(deck), {CardType.Weather}) * 15 -
+          countNames(activeDeck(deck), 'Luftwesen') * 15;
     }),
     Card('Sammler', CardType.Wizard, false, 7, (deck) {}, (deck) {
       int max = activeDeck(deck)
@@ -428,6 +431,10 @@ bool deckContainsType(Map<Card, bool?> deck, CardType type) {
 
 int amountOf(Iterable<Card> aDeck, Iterable<CardType> set) {
   return aDeck.fold<int>(0, (prev, card) => set.contains(card._cardType) ? 1 + prev : prev);
+}
+
+int countNames(Iterable<Card> aDeck, String name) {
+  return aDeck.where((element) => element.name == name).fold<int>(0, (prev, cur) => prev + 1);
 }
 
 enum CardType { Weather, Wizard, Weapon, Land, Wild, Flood, Flame, Army, Artifact, Leader, Beast }
