@@ -20,32 +20,28 @@ class TakePictureScreenState extends State<CameraScan> {
   late CameraController _controller;
   late Future<void> _initializeControllerFuture;
   final Set<String> _cards = {};
+  final _textDetector = GoogleMlKit.vision.textDetector();
+  bool _scanning = false;
+
   @override
   void initState() {
     super.initState();
-    // To display the current output from the Camera,
-    // create a CameraController.
     _controller = CameraController(
-      // Get a specific camera from the list of available cameras.
       widget.camera,
-      // Define the resolution to use.
-      ResolutionPreset.ultraHigh,
+      ResolutionPreset.max,
     );
-
-    // Next, initialize the controller. This returns a Future.
     _initializeControllerFuture = _controller.initialize();
   }
 
   @override
   void dispose() {
-    // Dispose of the controller when the widget is disposed.
     _controller.dispose();
+    _textDetector.close();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    // Fill this out in the next steps.
     return Scaffold(
       appBar: AppBar(
         title: Row(
@@ -81,57 +77,57 @@ class TakePictureScreenState extends State<CameraScan> {
         children: [
           FloatingActionButton(
               heroTag: 'btn1',
-              child: const Icon(Icons.add),
+              backgroundColor: _cards.isNotEmpty ? Colors.green : Colors.grey,
+              child: const Icon(Icons.check),
               onPressed: () {
                 Navigator.of(context).pop(_cards);
               }),
           FloatingActionButton(
             heroTag: 'btn2',
-            // Provide an onPressed callback.
             onPressed: () async {
-              // Take the Picture in a try / catch block. If anything goes wrong,
-              // catch the error.
-              try {
-                // Ensure that the camera is initialized.
-                await _initializeControllerFuture;
-
-                // Attempt to take a picture and then get the location
-                // where the image file is saved.
-                final cameraImage = await _controller.takePicture();
-
-                final inputImage = InputImage.fromFilePath(cameraImage.path);
-
-                final textDetector = GoogleMlKit.vision.textDetector();
-
-                final RecognisedText recognisedText = await textDetector.processImage(inputImage);
-                List<String> foundCards = [];
-                for (TextBlock block in recognisedText.blocks) {
-                  for (TextLine line in block.lines) {
-                    if (Deck()
-                        .cards
-                        .map((card) => card.name)
-                        .where((element) => element == line.text)
-                        .isNotEmpty) {
-                      foundCards.add(line.text);
-                    }
-                  }
-                }
-                print(foundCards);
+              if (_scanning) {
                 setState(() {
-                  _cards.addAll(foundCards);
+                  _scanning = false;
                 });
-                textDetector.close();
-              } catch (e) {
-                // If an error occurs, log the error to the console.
-                if (kDebugMode) {
-                  print(e);
+              } else {
+                setState(() {
+                  _scanning = true;
+                });
+                while (_scanning) {
+                  await _scann();
                 }
               }
             },
-            child: const Icon(Icons.camera_alt),
+            child: Icon(_scanning ? Icons.close : Icons.camera_alt),
           ),
         ],
       ),
     );
+  }
+
+  Future<void> _scann() async {
+    try {
+      await _initializeControllerFuture;
+      final cameraImage = await _controller.takePicture();
+      final inputImage = InputImage.fromFilePath(cameraImage.path);
+
+      final RecognisedText recognisedText = await _textDetector.processImage(inputImage);
+      List<String> foundCards = [];
+      for (TextBlock block in recognisedText.blocks) {
+        for (TextLine line in block.lines) {
+          if (Deck().cards.map((card) => card.name).where((element) => element == line.text).isNotEmpty) {
+            foundCards.add(line.text);
+          }
+        }
+      }
+      setState(() {
+        _cards.addAll(foundCards);
+      });
+    } catch (e) {
+      // If an error occurs, log the error to the console.
+      if (kDebugMode) {
+        print(e);
+      }
+    }
   }
 }
