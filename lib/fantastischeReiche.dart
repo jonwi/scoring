@@ -18,7 +18,7 @@ class FantastischeReiche extends StatefulWidget {
 
 class HandWidget extends State<FantastischeReiche> {
   /// Card and Active State where true means the card counts towards total and false means its deactivated
-  final Map<game.Card, bool?> _hand = HashMap<game.Card, bool?>(equals: (c1, c2) => c1.name == c2.name);
+  final Map<game.Card, bool?> _hand = SplayTreeMap<game.Card, bool?>((c1, c2) => c1.name.compareTo(c2.name));
   int _sum = 0;
 
   @override
@@ -135,7 +135,7 @@ class HandWidget extends State<FantastischeReiche> {
   void _addCard(String cardName) {
     setState(() {
       game.Card card = game.Deck().cards.firstWhere((element) => element.name == cardName);
-      if (!_hand.containsKey(card)) {
+      if (!_hand.keys.map((card) => card.name).contains(card.name)) {
         _hand[card] = null;
         _calculateDeck();
       }
