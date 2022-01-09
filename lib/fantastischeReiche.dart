@@ -3,6 +3,7 @@ import 'dart:collection';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:scoring/cameraScan.dart';
+import 'package:scoring/typeSelector.dart';
 
 import 'card.dart' as game;
 import 'cardSelector.dart';
@@ -44,90 +45,119 @@ class HandWidget extends State<FantastischeReiche> {
       body: Center(
         child: ListView.builder(
           // Deck
-          itemCount: _hand.length,
+          itemCount: _hand.length + 1,
           itemBuilder: (context, i) {
-            game.Card card = _hand.keys.elementAt(i);
-            return ListTile(
-              title: Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  Container(
-                      margin: const EdgeInsets.only(right: 15),
-                      decoration: BoxDecoration(
-                        boxShadow: [BoxShadow(color: card.cardType.color, spreadRadius: 10)],
-                        borderRadius: BorderRadius.circular(16),
-                        color: card.cardType.color,
-                      ),
-                      child: SizedBox(
-                        width: 20,
-                        child: Center(
-                          child: Text(
-                            '${card.baseStrength}',
-                            style: TextStyle(
-                              color: card.cardType == game.CardType.army ? Colors.white : Colors.black,
+            if (i == _hand.length) {
+              return ListTile(
+                title: SizedBox(
+                  height: 100,
+                ),
+              );
+            } else {
+              game.Card card = _hand.keys.elementAt(i);
+              return ListTile(
+                onTap: () {
+                  setState(() {
+                    _hand[card]!.visibility = !_hand[card]!.visibility;
+                  });
+                },
+                title: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    Container(
+                        margin: const EdgeInsets.only(right: 15),
+                        decoration: BoxDecoration(
+                          boxShadow: [BoxShadow(color: card.cardType.color, spreadRadius: 10)],
+                          borderRadius: BorderRadius.circular(16),
+                          color: card.cardType.color,
+                        ),
+                        child: SizedBox(
+                          width: 20,
+                          child: Center(
+                            child: Text(
+                              '${card.baseStrength}',
+                              style: TextStyle(
+                                color: card.cardType.textColor,
+                              ),
                             ),
                           ),
-                        ),
-                      )),
-                  Expanded(
-                    flex: 5,
-                    child: Text(card.name,
-                        style: TextStyle(
-                            decoration: _hand[card]?.activationState ?? true
-                                ? TextDecoration.none
-                                : TextDecoration.lineThrough)),
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.circle),
-                    onPressed: card.hasAction
-                        ? () {
-                            _performAction(card);
-                          }
-                        : () {},
-                    color: card.hasAction ? Colors.green : Colors.white,
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.unfold_more),
-                    onPressed: () {
-                      setState(() {
-                        _hand[card]!.visibility = !_hand[card]!.visibility;
-                      });
-                    },
-                  ),
-                  Expanded(
-                    flex: 1,
-                    child: Text('${card.bonus(_hand)}',
-                        style: TextStyle(color: card.bonus(_hand) > 0 ? Colors.green : Colors.red)),
-                  )
-                ],
-              ),
-              subtitle: AnimatedOpacity(
-                  opacity: _hand[card]!.visibility ? 1.0 : 0,
-                  duration: const Duration(milliseconds: 500),
-                  child: Visibility(
-                      visible: _hand[card]!.visibility,
-                      child: Wrap(children: [Center(child: card.description)]))),
-              onLongPress: () => _removeCard(card),
-              trailing: FittedBox(
-                child: IconButton(
-                  icon: const Icon(
-                    Icons.remove_circle_outline_sharp,
-                    color: Colors.red,
-                  ),
-                  onPressed: () => _removeCard(card),
+                        )),
+                    Expanded(
+                      flex: 5,
+                      child: Text(card.name,
+                          style: TextStyle(
+                              decoration: _hand[card]?.activationState ?? true
+                                  ? TextDecoration.none
+                                  : TextDecoration.lineThrough)),
+                    ),
+                    card.hasAction
+                        ? Expanded(
+                            flex: 1,
+                            child: IconButton(
+                              icon: const Icon(
+                                Icons.circle,
+                                size: 35,
+                              ),
+                              onPressed: card.hasAction
+                                  ? () {
+                                      _performAction(card);
+                                    }
+                                  : () {},
+                              color: card.hasAction ? Colors.green : Colors.white,
+                            ),
+                          )
+                        : const Spacer(
+                            flex: 1,
+                          ),
+                    Expanded(
+                      flex: 1,
+                      child: Center(
+                        child: Text('${card.bonus(_hand) - card.penalty(_hand)}',
+                            style: TextStyle(
+                                color:
+                                    card.bonus(_hand) - card.penalty(_hand) > 0 ? Colors.green : Colors.red)),
+                      ),
+                    ),
+                    Expanded(
+                      flex: 1,
+                      child: Center(
+                        child: Text('${card.calculateStrength(_hand)}',
+                            style: TextStyle(color: card.bonus(_hand) > 0 ? Colors.green : Colors.red)),
+                      ),
+                    )
+                  ],
                 ),
-              ),
-            );
+                subtitle: AnimatedOpacity(
+                    opacity: _hand[card]!.visibility ? 1.0 : 0,
+                    duration: const Duration(milliseconds: 500),
+                    child: Visibility(
+                        visible: _hand[card]!.visibility,
+                        child: Wrap(children: [Center(child: card.description)]))),
+                onLongPress: () => _removeCard(card),
+                trailing: FittedBox(
+                  child: IconButton(
+                    icon: const Icon(
+                      Icons.remove_circle_outline_sharp,
+                      color: Colors.red,
+                    ),
+                    onPressed: () => _removeCard(card),
+                  ),
+                ),
+              );
+            }
           },
         ),
       ),
-      bottomNavigationBar: ElevatedButton(
-          onPressed: () {
-            while (_hand.isNotEmpty) {
-              _removeCard(_hand.keys.first);
-            }
-          },
-          child: const Text('Alle entfernen')),
+      bottomNavigationBar: Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
+        ElevatedButton(onPressed: () => _resetActions(), child: const Text('Aktionen rückgängig')),
+        ElevatedButton(
+            onPressed: () {
+              while (_hand.isNotEmpty) {
+                _removeCard(_hand.keys.first);
+              }
+            },
+            child: const Text('Alle entfernen')),
+      ]),
       floatingActionButton: Column(mainAxisAlignment: MainAxisAlignment.end, children: [
         FloatingActionButton(
             heroTag: 'btn1',
@@ -217,7 +247,54 @@ class HandWidget extends State<FantastischeReiche> {
           }
         }
         break;
+      case game.ActionCards.doppelganger:
+        final cardName = await Navigator.push(context, MaterialPageRoute<String>(builder: (context) {
+          return CardSelector(
+            selector: (card) =>
+                _hand.keys.map((e) => e.name).contains(card.name) &&
+                card.actionCards != game.ActionCards.doppelganger,
+          );
+        }));
+        if (cardName != null) {
+          game.Card chosen = _hand.keys.where((element) => element.name == cardName).elementAt(0);
+          card.name = chosen.name;
+          // card.penalty = chosen.penalty;
+          card.cardType = chosen.cardType;
+          card.baseStrength = chosen.baseStrength;
+        }
+        break;
+      case game.ActionCards.bookOfChange:
+        final cardName = await Navigator.push(context, MaterialPageRoute<String>(builder: (context) {
+          return CardSelector(
+            selector: (card) => _hand.keys.map((e) => e.name).contains(card.name),
+          );
+        }));
+        final cardType = await Navigator.push(context, MaterialPageRoute<game.CardType>(builder: (context) {
+          return TypeSelector(selector: (type) => type != game.CardType.wild);
+        }));
+        if (cardName != null && cardType != null) {
+          game.Card chosen = _hand.keys.where((element) => element.name == cardName).first;
+          chosen.cardType = cardType;
+        }
+        break;
+      case game.ActionCards.island:
+        final cardName = await Navigator.push(context, MaterialPageRoute<String>(builder: (context) {
+          return CardSelector(
+            selector: (card) =>
+                _hand.keys.map((e) => e.name).contains(card.name) &&
+                (card.cardType == game.CardType.flame || card.cardType == game.CardType.flood),
+          );
+        }));
+        if (cardName != null) {
+          game.Card chosen = _hand.keys.where((element) => element.name == cardName).first;
+          _hand[chosen]?.activationState = true;
+          chosen.penalty = (deck) => 0;
+        }
+        break;
     }
+    setState(() {
+      _calculateDeck();
+    });
   }
 
   void _addCard(String cardName) {
@@ -254,5 +331,20 @@ class HandWidget extends State<FantastischeReiche> {
   int maxCards() {
     if (_hand.keys.map((e) => e.name).contains('Totenbeschwörer')) return 8;
     return 7;
+  }
+
+  void _resetActions() {
+    for (var key in _hand.keys.toList()) {
+      if (key.actionCards != game.ActionCards.none) {
+        game.Card card = game.Deck().cards.where((element) => element.actionCards == key.actionCards).first;
+        _hand[card] = _hand.remove(key)!;
+      } else {
+        game.Card card = game.Deck().cards.where((element) => element.name == key.name).first;
+        _hand[card] = _hand.remove(key)!;
+      }
+    }
+    setState(() {
+      _calculateDeck();
+    });
   }
 }
