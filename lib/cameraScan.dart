@@ -104,25 +104,29 @@ class TakePictureScreenState extends State<CameraScan> {
               );
             }),
       ]),
-      floatingActionButton: Column(
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [
-          FloatingActionButton(
-              heroTag: 'btn1',
-              backgroundColor: _cards.isNotEmpty ? Colors.green : Colors.grey,
-              child: const Icon(Icons.check),
-              onPressed: () {
-                Navigator.of(context).pop(_cards.keys.toSet());
-              }),
-          FloatingActionButton(
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      floatingActionButton: Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
+        Expanded(
+          flex: 1,
+          child: FloatingActionButton(
             heroTag: 'btn2',
             onPressed: () async {
               await _scan();
             },
             child: const Icon(Icons.camera_alt),
           ),
-        ],
-      ),
+        ),
+        Expanded(
+          flex: 1,
+          child: FloatingActionButton(
+              heroTag: 'btn1',
+              backgroundColor: _cards.isNotEmpty ? Colors.green : Colors.grey,
+              child: const Icon(Icons.check),
+              onPressed: () {
+                Navigator.of(context).pop(_cards.keys.toSet());
+              }),
+        ),
+      ]),
     );
   }
 
