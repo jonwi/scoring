@@ -24,32 +24,25 @@ class HandWidget extends State<FantastischeReiche> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: _buildAppBar(),
-      body: Center(
-        child: ListView.builder(
-          // Deck
-          itemCount: _hand.length + 1,
-          itemBuilder: (context, i) {
-            if (i == _hand.length) {
-              return const ListTile(
-                title: SizedBox(
-                  height: 100,
-                ),
-              );
-            } else {
-              var entry = _hand.entries.elementAt(i);
-              var card = entry.key;
-              return ListTile(
-                onTap: () {
-                  setState(() {
-                    entry.value.visibility = !entry.value.visibility;
-                  });
-                },
-                title: _buildStats(entry),
-                subtitle: _buildDescription(entry),
-                onLongPress: () => _removeCard(card),
-              );
-            }
-          },
+      body: SingleChildScrollView(
+        child: Center(
+          child: ExpansionPanelList(
+            children: _hand.entries
+                .map<ExpansionPanel>((entry) => ExpansionPanel(
+                      headerBuilder: (BuildContext context, bool isExpanded) {
+                        return _buildStats(entry);
+                      },
+                      body: _buildDescription(entry),
+                      isExpanded: entry.value.visibility,
+                      canTapOnHeader: true,
+                    ))
+                .toList(),
+            expansionCallback: (index, isActive) {
+              setState(() {
+                _hand.entries.elementAt(index).value.visibility = !isActive;
+              });
+            },
+          ),
         ),
       ),
       bottomNavigationBar: Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
@@ -96,7 +89,9 @@ class HandWidget extends State<FantastischeReiche> {
         final result = await Navigator.push(
           context,
           MaterialPageRoute<game.Cards>(builder: (context) {
-            return const CardSelector(); // TODO: remove current hand from selection, this requires a id for every card since everything else can be changed with actions
+            return CardSelector(
+              selector: (card) => !_hand.keys.map((card) => card.id).contains(card.id),
+            );
           }),
         );
         if (result != null && _hand.length <= 8) {
@@ -123,7 +118,7 @@ class HandWidget extends State<FantastischeReiche> {
       children: [
         Container(
             // baseStrength
-            margin: const EdgeInsets.only(right: 15),
+            margin: const EdgeInsets.all(15),
             decoration: BoxDecoration(
               boxShadow: [BoxShadow(color: card.cardType.color, spreadRadius: 10)],
               borderRadius: BorderRadius.circular(16),
