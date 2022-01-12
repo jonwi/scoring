@@ -65,7 +65,8 @@ class TakePictureScreenState extends State<CameraScan> {
             itemBuilder: (context, index) {
               var list = _cards.entries.toList();
               list.sort((e1, e2) => e1.value.compareTo(e2.value));
-              var name = list.elementAt(index).key.cardName;
+              var key = list.elementAt(index).key;
+              var name = key.cardName;
               return ListTile(
                 title: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
                   Container(
@@ -95,7 +96,7 @@ class TakePictureScreenState extends State<CameraScan> {
                       ),
                       onPressed: () {
                         setState(() {
-                          _cards.remove(name);
+                          _cards.remove(key);
                         });
                       },
                     ),
@@ -105,7 +106,10 @@ class TakePictureScreenState extends State<CameraScan> {
             }),
       ]),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      floatingActionButton: Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
+      floatingActionButton: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+        const Spacer(
+          flex: 2,
+        ),
         Expanded(
           flex: 1,
           child: FloatingActionButton(
@@ -132,39 +136,54 @@ class TakePictureScreenState extends State<CameraScan> {
 
   Future<void> _scan() async {
     try {
+      final firstMessure = DateTime.now().millisecondsSinceEpoch;
       await _initializeControllerFuture;
       final cameraImage = await _controller.takePicture();
       final inputImage = InputImage.fromFilePath(cameraImage.path);
 
+      final secondMessure = DateTime.now().millisecondsSinceEpoch;
       final RecognisedText recognisedText = await _textDetector.processImage(inputImage);
+      final thirdMessure = DateTime.now().millisecondsSinceEpoch;
       List<String> foundCards = [];
       print(recognisedText.text);
       for (TextBlock block in recognisedText.blocks) {
         for (TextLine line in block.lines) {
-          var list = Deck().cards.map((card) => card.name).where((name) {
-            var a = line.text.replaceAll(RegExp('[MTHhbtä]'), '').toLowerCase();
-            var b = name.replaceAll(RegExp('[MTHhbtä]'), '').toLowerCase();
-            return a.contains(b);
+          var list = Deck().cards.map((card) => card.id).where((id) {
+            final String text = line.text.replaceAll(RegExp('[0-9 ,.)]'), '');
+
+            if (text == id.cardName.replaceAll(' ', '')) {
+              return true;
+            } else if (aliases.containsKey(text) && aliases[text] == id) {
+              return true;
+            } else {
+              var a = text.replaceAll(RegExp('[MTHhbtä]'), '').toLowerCase();
+              var b = id.cardName.replaceAll(RegExp('[MTHhbtä]'), '').toLowerCase();
+              return a == b;
+            }
           });
           if (list.isNotEmpty) {
             if (list.length == 1) {
-              foundCards.add(list.first);
+              foundCards.add(list.first.cardName);
             } else {
               // Königin contains König
-              if (list.first == 'König' || list.first == 'Königin') {
+              if (list.first.name == 'König' || list.first.name == 'Königin') {
                 foundCards.add('Königin');
               }
-              if (list.first == 'Blizzard' || list.first == 'Blitz') {
+              if (list.first.name == 'Blizzard' || list.first.name == 'Blitz') {
                 foundCards.add('Blizzard');
               }
             }
           }
         }
       }
-      int c = 0;
       for (var name in foundCards) {
-        _cards.putIfAbsent(Deck().cards.firstWhere((element) => element.name == name).id, () => c++);
+        _cards.putIfAbsent(
+            Deck().cards.firstWhere((element) => element.name == name).id, () => _cards.length);
       }
+      final lastMessre = DateTime.now().millisecondsSinceEpoch;
+      print(secondMessure - firstMessure);
+      print(thirdMessure - secondMessure);
+      print(lastMessre - thirdMessure);
       setState(() {});
     } catch (e) {
       // If an error occurs, log the error to the console.
@@ -174,3 +193,5 @@ class TakePictureScreenState extends State<CameraScan> {
     }
   }
 }
+
+Map<String, Cards> aliases = {'BuchderVeränderurng': Cards.buchDerVeraenderung};
