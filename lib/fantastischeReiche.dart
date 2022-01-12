@@ -17,7 +17,7 @@ class FantastischeReiche extends StatefulWidget {
 
 class HandWidget extends State<FantastischeReiche> {
   /// Card and Active State where true means the card counts towards total and false means its deactivated and visibility
-  final Map<game.Card, game.CardState> _hand = {};
+  final Map<game.Card, CardState> _hand = {};
   int _sum = 0;
 
   @override
@@ -87,7 +87,7 @@ class HandWidget extends State<FantastischeReiche> {
           WidgetsFlutterBinding.ensureInitialized();
           final cameras = await availableCameras();
           final firstCamera = cameras.first;
-          var result = await Navigator.push<Set<String>>(context, MaterialPageRoute(builder: (context) {
+          var result = await Navigator.push<Set<game.Cards>>(context, MaterialPageRoute(builder: (context) {
             return CameraScan(camera: firstCamera);
           }));
           result?.forEach((element) {
@@ -104,7 +104,7 @@ class HandWidget extends State<FantastischeReiche> {
       onPressed: () async {
         final result = await Navigator.push(
           context,
-          MaterialPageRoute<String>(builder: (context) {
+          MaterialPageRoute<game.Cards>(builder: (context) {
             return const CardSelector(); // TODO: remove current hand from selection, this requires a id for every card since everything else can be changed with actions
           }),
         );
@@ -116,7 +116,7 @@ class HandWidget extends State<FantastischeReiche> {
   }
 
   /// description of given card
-  AnimatedOpacity _buildDescription(MapEntry<game.Card, game.CardState> entry) {
+  AnimatedOpacity _buildDescription(MapEntry<game.Card, CardState> entry) {
     return AnimatedOpacity(
         opacity: entry.value.visibility ? 1.0 : 0,
         duration: const Duration(milliseconds: 500),
@@ -125,7 +125,7 @@ class HandWidget extends State<FantastischeReiche> {
   }
 
   /// Stats containing base strength, name, actionButton, bonus and penalty, and overall total
-  Row _buildStats(MapEntry<game.Card, game.CardState> entry) {
+  Row _buildStats(MapEntry<game.Card, CardState> entry) {
     final card = entry.key;
     return Row(
       mainAxisAlignment: MainAxisAlignment.end,
@@ -218,10 +218,11 @@ class HandWidget extends State<FantastischeReiche> {
     );
   }
 
-  Future<void> _performAction(card) async {
+  /// performs the action associated with the card if there is any
+  Future<void> _performAction(game.Card card) async {
     switch (card.id) {
       case game.Cards.spiegelung:
-        final cardName = await Navigator.push(context, MaterialPageRoute<String>(builder: (context) {
+        final cardID = await Navigator.push(context, MaterialPageRoute<game.Cards>(builder: (context) {
           return CardSelector(
               selector: (card) => {
                     game.CardType.army,
@@ -231,8 +232,8 @@ class HandWidget extends State<FantastischeReiche> {
                     game.CardType.flame
                   }.contains(card.cardType));
         }));
-        if (cardName != null) {
-          game.Card chosen = game.Deck().cards.firstWhere((element) => element.name == cardName);
+        if (cardID != null) {
+          game.Card chosen = game.Deck().cards.firstWhere((element) => element.id == cardID);
           if ({
             game.CardType.army,
             game.CardType.land,
@@ -242,12 +243,13 @@ class HandWidget extends State<FantastischeReiche> {
           }.contains(chosen.cardType)) {
             card.name = chosen.name;
             card.cardType = chosen.cardType;
+            _hand[card] = _hand[card]!;
             print('Spiegelung ausgewählt');
           }
         }
         break;
       case game.Cards.gestaltwandler:
-        final cardName = await Navigator.push(context, MaterialPageRoute<String>(builder: (context) {
+        final cardId = await Navigator.push(context, MaterialPageRoute<game.Cards>(builder: (context) {
           return CardSelector(
               selector: (card) => {
                     game.CardType.artifact,
@@ -257,8 +259,8 @@ class HandWidget extends State<FantastischeReiche> {
                     game.CardType.beast,
                   }.contains(card.cardType));
         }));
-        if (cardName != null) {
-          game.Card chosen = game.Deck().cards.firstWhere((element) => element.name == cardName);
+        if (cardId != null) {
+          game.Card chosen = game.Deck().cards.firstWhere((element) => element.id == cardId);
           if ({
             game.CardType.artifact,
             game.CardType.leader,
@@ -268,81 +270,90 @@ class HandWidget extends State<FantastischeReiche> {
           }.contains(chosen.cardType)) {
             card.name = chosen.name;
             card.cardType = chosen.cardType;
+            _hand[card] = _hand[card]!;
             print('gestaltwandler ausgewahlt');
           }
         }
         break;
       case game.Cards.doppelgaenger:
-        final cardName = await Navigator.push(context, MaterialPageRoute<String>(builder: (context) {
+        final cardID = await Navigator.push(context, MaterialPageRoute<game.Cards>(builder: (context) {
           return CardSelector(
             selector: (card) =>
-                _hand.keys.map((e) => e.name).contains(card.name) && card.id != game.Cards.doppelgaenger,
+                _hand.keys.map((e) => e.id).contains(card.id) && card.id != game.Cards.doppelgaenger,
           );
         }));
-        if (cardName != null) {
-          game.Card chosen = _hand.keys.where((element) => element.name == cardName).elementAt(0);
+        if (cardID != null) {
+          game.Card chosen = _hand.keys.where((element) => element.id == cardID).elementAt(0);
           card.name = chosen.name;
-          // TODO hier muss noch eine penalty gemacht werden
-          // card.penalty = chosen.penalty;
+          card.penalty = chosen.penalty;
           card.cardType = chosen.cardType;
           card.baseStrength = chosen.baseStrength;
+          _hand[card] = _hand[card]!;
           print('doppelgänger ausgewählt');
         }
         break;
       case game.Cards.buchDerVeraenderung:
-        final cardName = await Navigator.push(context, MaterialPageRoute<String>(builder: (context) {
+        final cardID = await Navigator.push(context, MaterialPageRoute<game.Cards>(builder: (context) {
           return CardSelector(
             selector: (c) => _hand.keys.map((e) => e.name).contains(c.name) && c.name != card.name,
           );
         }));
-        if (cardName != null) {
+        if (cardID != null) {
           final cardType = await Navigator.push(context, MaterialPageRoute<game.CardType>(builder: (context) {
             return TypeSelector(selector: (type) => type != game.CardType.wild);
           }));
           if (cardType != null) {
-            game.Card chosen = _hand.keys.where((element) => element.name == cardName).first;
+            game.Card chosen = _hand.keys.where((element) => element.id == cardID).first;
             chosen.cardType = cardType;
           }
         }
         print('book of change ausgewahlt');
         break;
       case game.Cards.insel:
-        final cardName = await Navigator.push(context, MaterialPageRoute<String>(builder: (context) {
+        final cardID = await Navigator.push(context, MaterialPageRoute<game.Cards>(builder: (context) {
           return CardSelector(
             selector: (card) =>
                 _hand.keys.map((e) => e.name).contains(card.name) &&
                 (card.cardType == game.CardType.flame || card.cardType == game.CardType.flood),
           );
         }));
-        if (cardName != null) {
-          game.Card chosen = _hand.keys.where((element) => element.name == cardName).first;
+        if (cardID != null) {
+          game.Card chosen = _hand.keys.where((element) => element.id == cardID).first;
           _hand[chosen]?.activationState = true;
           chosen.penalty = (deck) => 0;
         }
         print('insel ausgweal');
         break;
+      default:
+        return;
     }
-    _calculateDeck();
+    _calculateHand();
   }
 
-  void _addCard(String cardName) {
-    game.Card card = game.Deck().cards.firstWhere((element) => element.name == cardName);
-    //TODO: Better with ID
-    if (!_hand.keys.map((card) => card.name).contains(card.name)) {
-      _hand[card] = game.CardState();
-      _calculateDeck();
+  /// adds the card to the current hand if not yet in there
+  void _addCard(game.Cards cardID) {
+    game.Card card = game.Deck().cards.firstWhere((element) => element.id == cardID);
+    if (!_hand.keys.map((card) => card.id).contains(card.id)) {
+      _hand[card] = CardState();
+      _calculateHand();
     }
   }
 
+  /// removes card from the current hand deck will be calculated again, actions might be undone
   void _removeCard(game.Card card) {
     _hand.remove(card);
-    _calculateDeck();
+    if (card.id == game.Cards.insel || card.id == game.Cards.buchDerVeraenderung) {
+      _resetActions();
+    } else {
+      _calculateHand();
+    }
   }
 
-  void _calculateDeck() {
+  /// calculates the strength of _hand unblocks everything, blocks, and then sums every card
+  void _calculateHand() {
     print('Start calculation');
     setState(() {
-      for (var entry in _hand.entries) {
+      for (MapEntry<game.Card, CardState> entry in _hand.entries) {
         print(entry.key.name);
         entry.value.activationState = null;
       }
@@ -357,16 +368,30 @@ class HandWidget extends State<FantastischeReiche> {
     print('finish calc');
   }
 
+  /// returns the number of cards that are allowed in the current hand
   int maxCards() {
     if (_hand.keys.map((e) => e.name).contains('Totenbeschwörer')) return 8;
     return 7;
   }
 
+  /// replaces every card in _hand with the original card to undo every change that might have occured.
   void _resetActions() {
     for (var entry in _hand.entries.toList()) {
       game.Card card = game.Deck().cards.firstWhere((element) => element.id == entry.key.id);
       _hand[card] = _hand.remove(entry.key)!;
     }
-    _calculateDeck();
+    _calculateHand();
+  }
+}
+
+class CardState {
+  bool? activationState;
+  bool visibility;
+
+  CardState({this.visibility = false, this.activationState});
+
+  bool isActive() {
+    if (activationState == null) return true;
+    return activationState!;
   }
 }

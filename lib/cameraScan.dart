@@ -19,7 +19,7 @@ class CameraScan extends StatefulWidget {
 class TakePictureScreenState extends State<CameraScan> {
   late CameraController _controller;
   late Future<void> _initializeControllerFuture;
-  final Map<String, int> _cards = {};
+  final Map<Cards, int> _cards = {};
   final _textDetector = GoogleMlKit.vision.textDetector();
 
   @override
@@ -65,7 +65,7 @@ class TakePictureScreenState extends State<CameraScan> {
             itemBuilder: (context, index) {
               var list = _cards.entries.toList();
               list.sort((e1, e2) => e1.value.compareTo(e2.value));
-              var name = list.elementAt(index).key;
+              var name = list.elementAt(index).key.name;
               return ListTile(
                 title: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
                   Container(
@@ -157,8 +157,9 @@ class TakePictureScreenState extends State<CameraScan> {
           }
         }
       }
+      int c = 0;
       for (var name in foundCards) {
-        _cards.putIfAbsent(name, () => _cards.length);
+        _cards.putIfAbsent(Deck().cards.firstWhere((element) => element.name == name).id, () => c++);
       }
       setState(() {});
     } catch (e) {

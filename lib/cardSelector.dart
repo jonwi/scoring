@@ -42,7 +42,7 @@ class CardSelector extends StatelessWidget {
                 ],
               ),
               onTap: () {
-                Navigator.pop(context, card.name);
+                Navigator.pop(context, card.id);
               },
             );
           }),

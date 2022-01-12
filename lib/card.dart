@@ -2,6 +2,8 @@ import 'dart:collection';
 
 import 'package:flutter/material.dart';
 
+import 'fantastischeReiche.dart';
+
 class Deck {
   List<Card> cards = [
     Card(
@@ -76,7 +78,7 @@ class Deck {
         (deck) {
           var aDeck = activeDeck(deck);
           return 8 *
-              amountOf(aDeck, {CardType.army, CardType.wizard, CardType.leader}, names: {'Prinzessin'});
+              amountOf(aDeck, {CardType.army, CardType.wizard, CardType.leader}, ids: {Cards.prinzessin});
         },
         RichText(
             text: TextSpan(style: const TextStyle(color: Colors.black), children: [
@@ -132,7 +134,7 @@ class Deck {
           const TextSpan(text: '.')
         ])),
         (deck) {
-          return 5 * amountOf(activeDeck(deck), {CardType.leader}, names: {'Kaiserin'});
+          return 5 * amountOf(activeDeck(deck), {CardType.leader}, ids: {Cards.kaiserin});
         }),
     Card(
         Cards.ritter,
@@ -195,7 +197,7 @@ class Deck {
           const TextSpan(text: '.')
         ])),
         (deck) {
-          return amountOf(activeDeck(deck), {CardType.land}, names: {'Leichte Kavallerie'}) * 2;
+          return amountOf(activeDeck(deck), {CardType.land}, ids: {Cards.leichteKavallerie}) * 2;
         }),
     Card(
         Cards.zwergeninfanterie,
@@ -206,7 +208,7 @@ class Deck {
         (deck) {},
         (deck) {
           if (contains(activeDeck(deck), 'Waldläufer')) return 0;
-          return amountOf(activeDeck(deck), {CardType.army}, names: {'Zwergeninfanterie'}) * -2;
+          return amountOf(activeDeck(deck), {CardType.army}, ids: {Cards.zwergeninfanterie}) * -2;
         },
         RichText(
             text: TextSpan(style: const TextStyle(color: Colors.black), children: [
@@ -641,7 +643,7 @@ class Deck {
         4,
         (deck) {},
         (deck) {
-          return amountOf(activeDeck(deck), {CardType.flame}, names: {'Feuerwesen'}) * 15;
+          return amountOf(activeDeck(deck), {CardType.flame}, ids: {Cards.feuerwesen}) * 15;
         },
         RichText(
             text: TextSpan(style: const TextStyle(color: Colors.black), children: [
@@ -791,7 +793,7 @@ class Deck {
         4,
         (deck) {},
         (deck) {
-          return amountOf(activeDeck(deck), {CardType.flood}, names: {'Wasserwesen'}) * 15;
+          return amountOf(activeDeck(deck), {CardType.flood}, ids: {Cards.wasserwesen}) * 15;
         },
         RichText(
             text: TextSpan(style: const TextStyle(color: Colors.black), children: [
@@ -978,7 +980,7 @@ class Deck {
         4,
         (deck) {},
         (deck) {
-          return amountOf(activeDeck(deck), {CardType.land}, names: {'Erdwesen'}) * 15;
+          return amountOf(activeDeck(deck), {CardType.land}, ids: {Cards.erdwesen}) * 15;
         },
         RichText(
             text: TextSpan(style: const TextStyle(color: Colors.black), children: [
@@ -1268,7 +1270,7 @@ class Deck {
         4,
         (deck) {},
         (deck) {
-          return amountOf(activeDeck(deck), {CardType.weather}, names: {'Luftwesen'}) * 15;
+          return amountOf(activeDeck(deck), {CardType.weather}, ids: {Cards.luftwesen}) * 15;
         },
         RichText(
             text: TextSpan(style: const TextStyle(color: Colors.black), children: [
@@ -1387,7 +1389,8 @@ class Deck {
           const TextSpan(text: '.')
         ])),
         (deck) {
-          return amountOf(activeDeck(deck), {CardType.leader, CardType.wizard}, names: {'Hexenmeister'}) * 10;
+          return amountOf(activeDeck(deck), {CardType.leader, CardType.wizard}, ids: {Cards.hexenmeister}) *
+              10;
         }),
     Card(
         Cards.magierin,
@@ -1455,12 +1458,12 @@ bool deckContainsType(Map<Card, CardState> deck, CardType type) {
   return deck.keys.where((card) => deck[card]?.activationState ?? true && card.cardType == type).isNotEmpty;
 }
 
-/// Counts the cards matching types excluding named cards in names
-int amountOf(Iterable<Card> aDeck, Iterable<CardType> types, {Set<String>? names}) {
+/// Counts the cards matching types excluding ids
+int amountOf(Iterable<Card> aDeck, Iterable<CardType> types, {Set<Cards>? ids}) {
   return aDeck.fold<int>(
       0,
       (prev, card) =>
-          types.contains(card.cardType) && (names == null || !names.contains(card.name)) ? 1 + prev : prev);
+          types.contains(card.cardType) && (ids == null || !ids.contains(card.id)) ? 1 + prev : prev);
 }
 
 int countNames(Iterable<Card> aDeck, String name) {
@@ -1551,10 +1554,10 @@ class Card implements Comparable<Card> {
 
   @override
   bool operator ==(Object other) =>
-      identical(this, other) || other is Card && runtimeType == other.runtimeType && name == other.name;
+      identical(this, other) || other is Card && runtimeType == other.runtimeType && id == other.id;
 
   @override
-  int get hashCode => name.hashCode;
+  int get hashCode => id.hashCode;
 
   Card(this.id, this.name, this.cardType, this.hasAction, this.baseStrength, this.block, this.bonus,
       this.description, this.penalty);
@@ -1570,18 +1573,6 @@ class Card implements Comparable<Card> {
   @override
   int compareTo(Card other) {
     return name.compareTo(other.name);
-  }
-}
-
-class CardState {
-  bool? activationState;
-  bool visibility;
-
-  CardState({this.visibility = false, this.activationState});
-
-  bool isActive() {
-    if (activationState == null) return true;
-    return activationState!;
   }
 }
 
