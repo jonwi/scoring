@@ -18,7 +18,7 @@ class TypeSelector extends StatelessWidget {
             var elementAt = list.elementAt(index);
             return ListTile(
               title: Row(children: [
-                Spacer(),
+                const Spacer(),
                 Expanded(
                   flex: 2,
                   child: Container(
@@ -35,7 +35,7 @@ class TypeSelector extends StatelessWidget {
                     ),
                   ),
                 ),
-                Spacer(),
+                const Spacer(),
               ]),
               onTap: () {
                 Navigator.pop(context, elementAt);
