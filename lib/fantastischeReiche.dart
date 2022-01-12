@@ -22,7 +22,6 @@ class HandWidget extends State<FantastischeReiche> {
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       appBar: _buildAppBar(),
       body: Center(
