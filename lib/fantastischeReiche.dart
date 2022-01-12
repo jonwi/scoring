@@ -22,6 +22,7 @@ class HandWidget extends State<FantastischeReiche> {
 
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
       appBar: _buildAppBar(),
       body: Center(
@@ -244,7 +245,6 @@ class HandWidget extends State<FantastischeReiche> {
             card.name = chosen.name;
             card.cardType = chosen.cardType;
             _hand[card] = _hand[card]!;
-            print('Spiegelung ausgewählt');
           }
         }
         break;
@@ -271,7 +271,6 @@ class HandWidget extends State<FantastischeReiche> {
             card.name = chosen.name;
             card.cardType = chosen.cardType;
             _hand[card] = _hand[card]!;
-            print('gestaltwandler ausgewahlt');
           }
         }
         break;
@@ -289,7 +288,6 @@ class HandWidget extends State<FantastischeReiche> {
           card.cardType = chosen.cardType;
           card.baseStrength = chosen.baseStrength;
           _hand[card] = _hand[card]!;
-          print('doppelgänger ausgewählt');
         }
         break;
       case game.Cards.buchDerVeraenderung:
@@ -307,7 +305,6 @@ class HandWidget extends State<FantastischeReiche> {
             chosen.cardType = cardType;
           }
         }
-        print('book of change ausgewahlt');
         break;
       case game.Cards.insel:
         final cardID = await Navigator.push(context, MaterialPageRoute<game.Cards>(builder: (context) {
@@ -322,7 +319,6 @@ class HandWidget extends State<FantastischeReiche> {
           _hand[chosen]?.activationState = true;
           chosen.penalty = (deck) => 0;
         }
-        print('insel ausgweal');
         break;
       default:
         return;
@@ -351,10 +347,8 @@ class HandWidget extends State<FantastischeReiche> {
 
   /// calculates the strength of _hand unblocks everything, blocks, and then sums every card
   void _calculateHand() {
-    print('Start calculation');
     setState(() {
       for (MapEntry<game.Card, CardState> entry in _hand.entries) {
-        print(entry.key.name);
         entry.value.activationState = null;
       }
       for (var key in _hand.keys) {
@@ -363,9 +357,7 @@ class HandWidget extends State<FantastischeReiche> {
       _sum = _hand.entries
           .where((e) => e.value.activationState == null || e.value.activationState == true)
           .fold(0, (previousValue, element) => previousValue + element.key.calculateStrength(_hand));
-      print('finish state');
     });
-    print('finish calc');
   }
 
   /// returns the number of cards that are allowed in the current hand

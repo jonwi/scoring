@@ -279,7 +279,6 @@ class Deck {
         (deck) {
           var aDeck = activeDeck(deck);
           var list = aDeck.map((e) => e.baseStrength).toSet().toList()..sort();
-          print(list);
           int max = 1;
           int current = 1;
           for (int i = 1; i < list.length; i++) {
@@ -295,7 +294,6 @@ class Deck {
               current = 1;
             }
           }
-          print(max);
           switch (max) {
             case 3:
               return 10;
