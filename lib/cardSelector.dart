@@ -32,8 +32,11 @@ class CardSelectorState extends State<CardSelector> {
           itemBuilder: (context, i) {
             var card = _filtered.elementAt(i);
             return ListTile(
-              subtitle:
-                  Visibility(visible: _expanded[i], child: Wrap(children: [Center(child: card.description)])),
+              subtitle: AnimatedOpacity(
+                  opacity: _expanded[i] ? 1 : 0,
+                  duration: const Duration(milliseconds: 700),
+                  child: Visibility(
+                      visible: _expanded[i], child: Wrap(children: [Center(child: card.description)]))),
               title: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [

@@ -169,7 +169,11 @@ class HandWidget extends State<FantastischeReiche> {
           child: Center(
             child: Text('${entry.value.isActive() ? card.bonus(_hand) - card.penalty(_hand) : 0}',
                 style: TextStyle(
-                    color: card.bonus(_hand) - card.penalty(_hand) > 0 ? Colors.green : Colors.red)),
+                    color: card.bonus(_hand) - card.penalty(_hand) >= 0
+                        ? card.bonus(_hand) - card.penalty(_hand) == 0
+                            ? Colors.black
+                            : Colors.green
+                        : Colors.red)),
           ),
         ),
         Expanded(
@@ -177,7 +181,12 @@ class HandWidget extends State<FantastischeReiche> {
           flex: 1,
           child: Center(
             child: Text('${entry.value.isActive() ? card.calculateStrength(_hand) : 0}',
-                style: TextStyle(color: card.bonus(_hand) > 0 ? Colors.green : Colors.red)),
+                style: TextStyle(
+                    color: card.calculateStrength(_hand) >= 0
+                        ? card.calculateStrength(_hand) == 0
+                            ? Colors.black
+                            : Colors.green
+                        : Colors.red)),
           ),
         ),
         FittedBox(
