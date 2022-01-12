@@ -19,9 +19,8 @@ class CameraScan extends StatefulWidget {
 class TakePictureScreenState extends State<CameraScan> {
   late CameraController _controller;
   late Future<void> _initializeControllerFuture;
-  final Set<String> _cards = {};
+  final Map<String, int> _cards = {};
   final _textDetector = GoogleMlKit.vision.textDetector();
-  bool _scanning = false;
 
   @override
   void initState() {
@@ -64,10 +63,43 @@ class TakePictureScreenState extends State<CameraScan> {
         ListView.builder(
             itemCount: _cards.length,
             itemBuilder: (context, index) {
+              var list = _cards.entries.toList();
+              list.sort((e1, e2) => e1.value.compareTo(e2.value));
+              var name = list.elementAt(index).key;
               return ListTile(
-                title: Text(
-                  _cards.elementAt(index),
-                  textAlign: TextAlign.right,
+                title: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
+                  Container(
+                    decoration: BoxDecoration(
+                        color: Colors.white,
+                        border: Border.all(color: Colors.white),
+                        borderRadius: BorderRadius.circular(10.0)),
+                    child: Padding(
+                      padding: const EdgeInsets.all(3),
+                      child: Text(
+                        name,
+                        textAlign: TextAlign.right,
+                      ),
+                    ),
+                  ),
+                ]),
+                trailing: CircleAvatar(
+                  backgroundColor: Colors.white,
+                  child: FittedBox(
+                    fit: BoxFit.fill,
+                    child: IconButton(
+                      padding: EdgeInsets.zero,
+                      iconSize: 70,
+                      icon: const Icon(
+                        Icons.remove_circle_outline_sharp,
+                        color: Colors.red,
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          _cards.remove(name);
+                        });
+                      },
+                    ),
+                  ),
                 ),
               );
             }),
@@ -80,32 +112,21 @@ class TakePictureScreenState extends State<CameraScan> {
               backgroundColor: _cards.isNotEmpty ? Colors.green : Colors.grey,
               child: const Icon(Icons.check),
               onPressed: () {
-                Navigator.of(context).pop(_cards);
+                Navigator.of(context).pop(_cards.keys.toSet());
               }),
           FloatingActionButton(
             heroTag: 'btn2',
             onPressed: () async {
-              if (_scanning) {
-                setState(() {
-                  _scanning = false;
-                });
-              } else {
-                setState(() {
-                  _scanning = true;
-                });
-                while (_scanning) {
-                  await _scann();
-                }
-              }
+              await _scan();
             },
-            child: Icon(_scanning ? Icons.close : Icons.camera_alt),
+            child: const Icon(Icons.camera_alt),
           ),
         ],
       ),
     );
   }
 
-  Future<void> _scann() async {
+  Future<void> _scan() async {
     try {
       await _initializeControllerFuture;
       final cameraImage = await _controller.takePicture();
@@ -113,16 +134,33 @@ class TakePictureScreenState extends State<CameraScan> {
 
       final RecognisedText recognisedText = await _textDetector.processImage(inputImage);
       List<String> foundCards = [];
+      print(recognisedText.text);
       for (TextBlock block in recognisedText.blocks) {
         for (TextLine line in block.lines) {
-          if (Deck().cards.map((card) => card.name).where((element) => element == line.text).isNotEmpty) {
-            foundCards.add(line.text);
+          var list = Deck().cards.map((card) => card.name).where((name) {
+            var a = line.text.replaceAll(RegExp('[MTHhbtä]'), '').toLowerCase();
+            var b = name.replaceAll(RegExp('[MTHhbtä]'), '').toLowerCase();
+            return a.contains(b);
+          });
+          if (list.isNotEmpty) {
+            if (list.length == 1) {
+              foundCards.add(list.first);
+            } else {
+              // Königin contains König
+              if (list.first == 'König' || list.first == 'Königin') {
+                foundCards.add('Königin');
+              }
+              if (list.first == 'Blizzard' || list.first == 'Blitz') {
+                foundCards.add('Blizzard');
+              }
+            }
           }
         }
       }
-      setState(() {
-        _cards.addAll(foundCards);
-      });
+      for (var name in foundCards) {
+        _cards.putIfAbsent(name, () => _cards.length);
+      }
+      setState(() {});
     } catch (e) {
       // If an error occurs, log the error to the console.
       if (kDebugMode) {
