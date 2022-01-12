@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 class Deck {
   List<Card> cards = [
     Card(
+        Cards.koenig,
         'König',
         CardType.leader,
         false,
@@ -31,11 +32,11 @@ class Deck {
             const TextSpan(text: '.')
           ],
         )),
-        ActionCards.none,
         (deck) {
           return 0;
         }),
     Card(
+        Cards.koenigin,
         'Königin',
         CardType.leader,
         false,
@@ -62,11 +63,11 @@ class Deck {
             const TextSpan(text: '.')
           ],
         )),
-        ActionCards.none,
         (deck) {
           return 0;
         }),
     Card(
+        Cards.prinzessin,
         'Prinzessin',
         CardType.leader,
         false,
@@ -87,11 +88,11 @@ class Deck {
           TextSpan(text: 'Anführer', style: TextStyle(color: CardType.leader.color)),
           const TextSpan(text: '.')
         ])),
-        ActionCards.none,
         (deck) {
           return 0;
         }),
     Card(
+        Cards.kriegsherr,
         'Kriegsherr',
         CardType.leader,
         false,
@@ -109,11 +110,11 @@ class Deck {
           TextSpan(text: 'Armee', style: TextStyle(color: CardType.army.color)),
           const TextSpan(text: '.')
         ])),
-        ActionCards.none,
         (deck) {
           return 0;
         }),
     Card(
+        Cards.kaiserin,
         'Kaiserin',
         CardType.leader,
         false,
@@ -130,11 +131,11 @@ class Deck {
           TextSpan(text: 'Anführer', style: TextStyle(color: CardType.leader.color)),
           const TextSpan(text: '.')
         ])),
-        ActionCards.none,
         (deck) {
           return 5 * amountOf(activeDeck(deck), {CardType.leader}, names: {'Kaiserin'});
         }),
     Card(
+        Cards.ritter,
         'Ritter',
         CardType.army,
         false,
@@ -149,7 +150,6 @@ class Deck {
           TextSpan(text: 'Anführer', style: TextStyle(color: CardType.leader.color)),
           const TextSpan(text: '.')
         ])),
-        ActionCards.none,
         (deck) {
           if (amountOf(activeDeck(deck), {CardType.leader}) > 0) {
             return 0;
@@ -157,6 +157,7 @@ class Deck {
           return 8;
         }),
     Card(
+        Cards.elbenschuetzen,
         'Elbenschützen',
         CardType.army,
         false,
@@ -174,11 +175,11 @@ class Deck {
           TextSpan(text: 'Wetter', style: TextStyle(color: CardType.weather.color)),
           const TextSpan(text: '.')
         ])),
-        ActionCards.none,
         (deck) {
           return 0;
         }),
     Card(
+        Cards.leichteKavallerie,
         'Leichte Kavallerie',
         CardType.army,
         false,
@@ -193,11 +194,11 @@ class Deck {
           TextSpan(text: 'Land', style: TextStyle(color: CardType.land.color)),
           const TextSpan(text: '.')
         ])),
-        ActionCards.none,
         (deck) {
           return amountOf(activeDeck(deck), {CardType.land}, names: {'Leichte Kavallerie'}) * 2;
         }),
     Card(
+        Cards.zwergeninfanterie,
         'Zwergeninfanterie',
         CardType.army,
         false,
@@ -213,11 +214,11 @@ class Deck {
           TextSpan(text: 'Armee', style: TextStyle(color: CardType.army.color)),
           const TextSpan(text: '.')
         ])),
-        ActionCards.none,
         (deck) {
           return 0;
         }),
     Card(
+        Cards.waldlaeufer,
         'Waldläufer',
         CardType.army,
         false,
@@ -234,11 +235,11 @@ class Deck {
           TextSpan(text: 'Armee', style: TextStyle(color: CardType.army.color)),
           const TextSpan(text: ' von allen Strafen AUF.')
         ])),
-        ActionCards.none,
         (deck) {
           return 0;
         }),
     Card(
+        Cards.schildVonKeth,
         'Schild von Keth',
         CardType.artifact,
         false,
@@ -263,47 +264,83 @@ class Deck {
           const TextSpan(text: ' und '),
           TextSpan(text: 'Schwert von Keth.', style: TextStyle(color: CardType.artifact.color))
         ])),
-        ActionCards.none,
         (deck) {
           return 0;
         }),
     Card(
+        Cards.juwelDerOrdnung,
         'Juwel der Ordnung',
         CardType.artifact,
         false,
         5,
         (deck) {},
         (deck) {
-          // TODO: hier muss nochgemacht werden
-          return 0;
+          var aDeck = activeDeck(deck);
+          var list = aDeck.map((e) => e.baseStrength).toSet().toList()..sort();
+          print(list);
+          int max = 1;
+          int current = 1;
+          for (int i = 1; i < list.length; i++) {
+            if (list.elementAt(i) == list.elementAt(i - 1) + 1) {
+              current++;
+              if (current > max) {
+                max = current;
+              }
+            } else if (list.elementAt(i) == list.elementAt(i - 1)) {
+              // ignore same baseStrength
+            } else {
+              // start over with the current element
+              current = 1;
+            }
+          }
+          print(max);
+          switch (max) {
+            case 3:
+              return 10;
+            case 4:
+              return 30;
+            case 5:
+              return 60;
+            case 6:
+              return 100;
+            case 7:
+              return 150;
+            default:
+              return 0;
+          }
         },
         RichText(
             text: const TextSpan(
                 style: TextStyle(color: Colors.black),
                 text:
                     '+10 für eine "Strasse" von 3 Karten, +30 für 4 Karten, +60 für 5 Karten, + 100 für 6 Karten, +150 für 7 Karten.')),
-        ActionCards.none,
         (deck) {
           return 0;
         }),
     Card(
+        Cards.weltenbaum,
         'Weltenbaum',
         CardType.artifact,
         false,
         2,
         (deck) {},
         (deck) {
-          return 0; // TODO: hier muss noch geamcht werden
+          var aDeck = activeDeck(deck);
+          var types = aDeck.map((e) => e.cardType).toSet();
+          if (aDeck.length == types.length) {
+            return 50;
+          }
+          return 0;
         },
         RichText(
             text: const TextSpan(
                 style: TextStyle(color: Colors.black),
                 text: '+50 wenn jede Nicht-Blockierte Karte eine unterschiedliche Farbe hat.')),
-        ActionCards.none,
         (deck) {
           return 0;
         }),
     Card(
+        Cards.buchDerVeraenderung,
         'Buch der Veränderung',
         CardType.artifact,
         true,
@@ -317,11 +354,11 @@ class Deck {
                 style: TextStyle(color: Colors.black),
                 text:
                     'Du darfst die Farbe einer anderen Karte verändern. Name, Bonus, Strafe und Basisstärke bleiben unverändert')),
-        ActionCards.bookOfChange,
         (deck) {
           return 0;
         }),
     Card(
+        Cards.runeDesSchutzes,
         'Rune des Schutzes',
         CardType.artifact,
         false,
@@ -337,11 +374,11 @@ class Deck {
         RichText(
             text: const TextSpan(
                 style: TextStyle(color: Colors.black), text: 'HEBT die Strafen auf allen Karten AUF.')),
-        ActionCards.none,
         (deck) {
           return 0;
         }),
     Card(
+        Cards.einhorn,
         'Einhorn',
         CardType.beast,
         false,
@@ -369,11 +406,11 @@ class Deck {
           TextSpan(text: 'Magierin', style: TextStyle(color: CardType.wizard.color)),
           const TextSpan(text: '.')
         ])),
-        ActionCards.none,
         (deck) {
           return 0;
         }),
     Card(
+        Cards.basilisk,
         'Basilisk',
         CardType.beast,
         false,
@@ -401,12 +438,12 @@ class Deck {
           TextSpan(text: 'Bestien', style: TextStyle(color: CardType.beast.color)),
           const TextSpan(text: '.')
         ])),
-        ActionCards.none,
         (deck) {
           return 0;
         }),
     Card(
-        'Schlachtenross',
+        Cards.schlachtross,
+        'Schlachtross',
         CardType.beast,
         false,
         6,
@@ -425,11 +462,11 @@ class Deck {
           TextSpan(text: 'Zauberer', style: TextStyle(color: CardType.wizard.color)),
           const TextSpan(text: '.')
         ])),
-        ActionCards.none,
         (deck) {
           return 0;
         }),
     Card(
+        Cards.drache,
         'Drache',
         CardType.beast,
         false,
@@ -444,7 +481,6 @@ class Deck {
           TextSpan(text: 'Zauberer', style: TextStyle(color: CardType.wizard.color)),
           const TextSpan(text: '.')
         ])),
-        ActionCards.none,
         (deck) {
           if (amountOf(activeDeck(deck), {CardType.wizard}) > 0) {
             return 0;
@@ -452,6 +488,7 @@ class Deck {
           return 40;
         }),
     Card(
+        Cards.hydra,
         'Hydra',
         CardType.beast,
         false,
@@ -469,11 +506,11 @@ class Deck {
           TextSpan(text: 'Sumpf', style: TextStyle(color: CardType.flood.color)),
           const TextSpan(text: '.')
         ])),
-        ActionCards.none,
         (deck) {
           return 0;
         }),
     Card(
+        Cards.buschfeuer,
         'Buschfeuer',
         CardType.flame,
         false,
@@ -483,7 +520,7 @@ class Deck {
             if ({CardType.flame, CardType.wizard, CardType.weather, CardType.weapon, CardType.artifact}
                     .contains(card.cardType) ||
                 card.name == 'Gebirge' ||
-                card.name == 'Grosse Flut' ||
+                card.name == 'Große Flut' ||
                 card.name == 'Insel' ||
                 card.name == 'Einhorn' ||
                 card.name == 'Drache' ||
@@ -514,7 +551,7 @@ class Deck {
           const TextSpan(text: ', '),
           TextSpan(text: 'Gebirge', style: TextStyle(color: CardType.land.color)),
           const TextSpan(text: ', '),
-          TextSpan(text: 'Grosse Flut', style: TextStyle(color: CardType.flood.color)),
+          TextSpan(text: 'Große Flut', style: TextStyle(color: CardType.flood.color)),
           const TextSpan(text: ', '),
           TextSpan(text: 'Insel', style: TextStyle(color: CardType.flood.color)),
           const TextSpan(text: ', '),
@@ -523,11 +560,11 @@ class Deck {
           TextSpan(text: 'Drache', style: TextStyle(color: CardType.beast.color)),
           const TextSpan(text: '.')
         ])),
-        ActionCards.none,
         (deck) {
           return 0;
         }),
     Card(
+        Cards.kerze,
         'Kerze',
         CardType.flame,
         false,
@@ -552,11 +589,11 @@ class Deck {
           TextSpan(text: 'Zauberer', style: TextStyle(color: CardType.wizard.color)),
           const TextSpan(text: '.')
         ])),
-        ActionCards.none,
         (deck) {
           return 0;
         }),
     Card(
+        Cards.schmiede,
         'Schmiede',
         CardType.flame,
         false,
@@ -573,11 +610,11 @@ class Deck {
           TextSpan(text: 'Artefakt', style: TextStyle(color: CardType.artifact.color)),
           const TextSpan(text: '.')
         ])),
-        ActionCards.none,
         (deck) {
           return 0;
         }),
     Card(
+        Cards.blitz,
         'Blitz',
         CardType.flame,
         false,
@@ -593,11 +630,11 @@ class Deck {
             text: const TextSpan(
                 style: TextStyle(color: Colors.black),
                 children: [TextSpan(text: '+30 mit '), TextSpan(text: 'Regensturm'), TextSpan(text: '.')])),
-        ActionCards.none,
         (deck) {
           return 0;
         }),
     Card(
+        Cards.feuerwesen,
         'Feuerwesen',
         CardType.flame,
         false,
@@ -612,11 +649,11 @@ class Deck {
           TextSpan(text: 'Flamme', style: TextStyle(color: CardType.flame.color)),
           const TextSpan(text: '.')
         ])),
-        ActionCards.none,
         (deck) {
           return 0;
         }),
     Card(
+        Cards.quelleDesLebens,
         'Quelle des Lebens',
         CardType.flood,
         false,
@@ -648,11 +685,11 @@ class Deck {
           TextSpan(text: 'Wetter', style: TextStyle(color: CardType.weather.color)),
           const TextSpan(text: '.')
         ])),
-        ActionCards.none,
         (deck) {
           return 0;
         }),
     Card(
+        Cards.sumpf,
         'Sumpf',
         CardType.flood,
         false,
@@ -669,7 +706,6 @@ class Deck {
           TextSpan(text: 'Flamme', style: TextStyle(color: CardType.flame.color)),
           const TextSpan(text: '.')
         ])),
-        ActionCards.none,
         (deck) {
           var aDeck = activeDeck(deck);
 
@@ -680,7 +716,8 @@ class Deck {
           }
         }),
     Card(
-        'Grosse Flut',
+        Cards.grosseFlut,
+        'Große Flut',
         CardType.flood,
         false,
         32,
@@ -722,11 +759,11 @@ class Deck {
           TextSpan(text: 'Blitz', style: TextStyle(color: CardType.flame.color)),
           const TextSpan(text: '.')
         ])),
-        ActionCards.none,
         (deck) {
           return 0;
         }),
     Card(
+        Cards.insel,
         'Insel',
         CardType.flood,
         true,
@@ -743,11 +780,11 @@ class Deck {
           TextSpan(text: 'Flamme', style: TextStyle(color: CardType.flame.color)),
           const TextSpan(text: ' AUF.')
         ])),
-        ActionCards.island,
         (deck) {
           return 0;
         }),
     Card(
+        Cards.wasserwesen,
         'Wasserwesen',
         CardType.flood,
         false,
@@ -762,11 +799,10 @@ class Deck {
           TextSpan(text: 'Flut', style: TextStyle(color: CardType.flood.color)),
           const TextSpan(text: '.')
         ])),
-        ActionCards.none,
         (deck) {
           return 0;
         }),
-    Card('Gestaltenwandler', CardType.wild, true, 0, (deck) {}, (deck) {
+    Card(Cards.gestaltwandler, 'Gestaltwandler', CardType.wild, true, 0, (deck) {}, (deck) {
       return 0;
     },
         RichText(
@@ -785,9 +821,8 @@ class Deck {
               text:
                   ' des Spiels kopieren. Übernimmt nicht Bonus, Strafen oder Basisstärke der entsprechenden Karte.')
         ])),
-        ActionCards.gestaltwandler,
         (deck) => 0),
-    Card('Spiegelung', CardType.wild, true, 0, (deck) {}, (deck) {
+    Card(Cards.spiegelung, 'Spiegelung', CardType.wild, true, 0, (deck) {}, (deck) {
       return 0;
     },
         RichText(
@@ -806,9 +841,9 @@ class Deck {
               text:
                   ' im Spiel kopieren. Übernimmt nicht Bonus, Strafen oder Basisstärke der entsprechenden Karte.')
         ])),
-        ActionCards.spiegelung,
         (deck) => 0),
     Card(
+        Cards.doppelgaenger,
         'Doppelgänger',
         CardType.wild,
         true,
@@ -822,11 +857,11 @@ class Deck {
                 style: TextStyle(color: Colors.black),
                 text:
                     'Kann Namen, Basisstärke, Farbe und Strafe ABER NICHT DEN BONUS einer anderen Karte in deiner Hand kopieren.')),
-        ActionCards.doppelganger,
         (deck) {
           return 0;
         }),
     Card(
+        Cards.gebirge,
         'Gebirge',
         CardType.land,
         false,
@@ -855,11 +890,11 @@ class Deck {
           TextSpan(text: 'Fluten', style: TextStyle(color: CardType.flood.color)),
           const TextSpan(text: ' AUF.')
         ])),
-        ActionCards.none,
         (deck) {
           return 0;
         }),
     Card(
+        Cards.hoehle,
         'Höhle',
         CardType.land,
         false,
@@ -888,11 +923,11 @@ class Deck {
           TextSpan(text: 'Wettern', style: TextStyle(color: CardType.weather.color)),
           const TextSpan(text: ' AUF.')
         ])),
-        ActionCards.none,
         (deck) {
           return 0;
         }),
     Card(
+        Cards.glockenturm,
         'Glockenturm',
         CardType.land,
         false,
@@ -910,11 +945,11 @@ class Deck {
           TextSpan(text: 'Zauberer', style: TextStyle(color: CardType.wizard.color)),
           const TextSpan(text: '.')
         ])),
-        ActionCards.none,
         (deck) {
           return 0;
         }),
     Card(
+        Cards.wald,
         'Wald',
         CardType.land,
         false,
@@ -922,7 +957,7 @@ class Deck {
         (deck) {},
         (deck) {
           return amountOf(activeDeck(deck), {CardType.beast}) * 12 +
-              (contains(activeDeck(deck), 'Waldläufer') ? 12 : 0);
+              (contains(activeDeck(deck), 'Elbenschützen') ? 12 : 0);
         },
         RichText(
             text: TextSpan(style: const TextStyle(color: Colors.black), children: [
@@ -932,11 +967,11 @@ class Deck {
           TextSpan(text: 'Elbenschützen', style: TextStyle(color: CardType.army.color)),
           const TextSpan(text: '.')
         ])),
-        ActionCards.none,
         (deck) {
           return 0;
         }),
     Card(
+        Cards.erdwesen,
         'Erdwesen',
         CardType.land,
         false,
@@ -951,11 +986,11 @@ class Deck {
           TextSpan(text: 'Land', style: TextStyle(color: CardType.land.color)),
           const TextSpan(text: '.')
         ])),
-        ActionCards.none,
         (deck) {
           return 0;
         }),
     Card(
+        Cards.kriegsschiff,
         'Kriegsschiff',
         CardType.weapon,
         false,
@@ -980,11 +1015,11 @@ class Deck {
           TextSpan(text: 'Fluten', style: TextStyle(color: CardType.flood.color)),
           const TextSpan(text: ' AUF.')
         ])),
-        ActionCards.none,
         (deck) {
           return 0;
         }),
     Card(
+        Cards.zauberstab,
         'Zauberstab',
         CardType.weapon,
         false,
@@ -1002,11 +1037,11 @@ class Deck {
           TextSpan(text: 'Zauberer', style: TextStyle(color: CardType.wizard.color)),
           const TextSpan(text: '.')
         ])),
-        ActionCards.none,
         (deck) {
           return 0;
         }),
     Card(
+        Cards.schwertVonKeth,
         'Schwert von Keth',
         CardType.weapon,
         false,
@@ -1032,11 +1067,11 @@ class Deck {
           TextSpan(text: 'Schild von Keth', style: TextStyle(color: CardType.artifact.color)),
           const TextSpan(text: '.')
         ])),
-        ActionCards.none,
         (deck) {
           return 0;
         }),
     Card(
+        Cards.elbischerBogen,
         'Elbischer Bogen',
         CardType.weapon,
         false,
@@ -1061,11 +1096,11 @@ class Deck {
           TextSpan(text: 'Herr der Bestien', style: TextStyle(color: CardType.wizard.color)),
           const TextSpan(text: '.')
         ])),
-        ActionCards.none,
         (deck) {
           return 0;
         }),
     Card(
+        Cards.kampfzeppelin,
         'Kampfzeppelin',
         CardType.weapon,
         false,
@@ -1093,11 +1128,11 @@ class Deck {
           TextSpan(text: 'Wetter', style: TextStyle(color: CardType.weather.color)),
           const TextSpan(text: '.')
         ])),
-        ActionCards.none,
         (deck) {
           return 0;
         }),
     Card(
+        Cards.regensturm,
         'Regensturm',
         CardType.weather,
         false,
@@ -1124,11 +1159,11 @@ class Deck {
           TextSpan(text: 'Blitz', style: TextStyle(color: CardType.flame.color)),
           const TextSpan(text: '.')
         ])),
-        ActionCards.none,
         (deck) {
           return 0;
         }),
     Card(
+        Cards.blizzard,
         'Blizzard',
         CardType.weather,
         false,
@@ -1159,7 +1194,6 @@ class Deck {
           TextSpan(text: 'Fluten', style: TextStyle(color: CardType.flood.color)),
           const TextSpan(text: '.')
         ])),
-        ActionCards.none,
         (deck) {
           if (contains(activeDeck(deck), 'Waldläufer')) {
             return amountOf(activeDeck(deck), {CardType.leader, CardType.beast, CardType.flame}) * 5;
@@ -1170,6 +1204,7 @@ class Deck {
           }
         }),
     Card(
+        Cards.rauch,
         'Rauch',
         CardType.weather,
         false,
@@ -1194,11 +1229,11 @@ class Deck {
           TextSpan(text: 'Flamme', style: TextStyle(color: CardType.flame.color)),
           const TextSpan(text: '.')
         ])),
-        ActionCards.none,
         (deck) {
           return 0;
         }),
     Card(
+        Cards.wirbelsturm,
         'Wirbelsturm',
         CardType.weather,
         false,
@@ -1207,7 +1242,7 @@ class Deck {
         (deck) {
           var aDeck = activeDeck(deck);
           if (contains(aDeck, 'Regensturm') &&
-              (contains(aDeck, 'Blizzard') || contains(aDeck, 'Grosse Flut'))) {
+              (contains(aDeck, 'Blizzard') || contains(aDeck, 'Große Flut'))) {
             return 40;
           }
           return 0;
@@ -1219,14 +1254,14 @@ class Deck {
           const TextSpan(text: ' und entweder '),
           TextSpan(text: 'Blizzard', style: TextStyle(color: CardType.weather.color)),
           const TextSpan(text: ' oder '),
-          TextSpan(text: 'Grosse Flut', style: TextStyle(color: CardType.flood.color)),
+          TextSpan(text: 'Große Flut', style: TextStyle(color: CardType.flood.color)),
           const TextSpan(text: '.')
         ])),
-        ActionCards.none,
         (deck) {
           return 0;
         }),
     Card(
+        Cards.luftwesen,
         'Luftwesen',
         CardType.weather,
         false,
@@ -1241,11 +1276,11 @@ class Deck {
           TextSpan(text: 'Wetter', style: TextStyle(color: CardType.weather.color)),
           const TextSpan(text: '.')
         ])),
-        ActionCards.none,
         (deck) {
           return 0;
         }),
     Card(
+        Cards.sammler,
         'Sammler',
         CardType.wizard,
         false,
@@ -1278,11 +1313,11 @@ class Deck {
                 style: TextStyle(color: Colors.black),
                 text:
                     '+10 für drei unterschiedliche Karten der gleichen Farbe, +40 für vier Karten der gleichen Farbe, +100 für fünf unterschiedliche Karten der gleichen Farbe')),
-        ActionCards.none,
         (deck) {
           return 0;
         }),
     Card(
+        Cards.herrDerBestien,
         'Herr der Bestien',
         CardType.wizard,
         false,
@@ -1305,11 +1340,11 @@ class Deck {
           TextSpan(text: 'Bestien', style: TextStyle(color: CardType.beast.color)),
           const TextSpan(text: ' AUF.')
         ])),
-        ActionCards.none,
         (deck) {
           return 0;
         }),
     Card(
+        Cards.totenbeschwoerer,
         'Totenbeschwörer',
         CardType.wizard,
         false,
@@ -1330,11 +1365,11 @@ class Deck {
           TextSpan(text: 'Bestie', style: TextStyle(color: CardType.beast.color)),
           const TextSpan(text: ' aus dem Ablagefach nehmen und sie als Karte deiner Hand werten.')
         ])),
-        ActionCards.none,
         (deck) {
           return 0;
         }),
     Card(
+        Cards.hexenmeister,
         'Hexenmeister',
         CardType.wizard,
         false,
@@ -1351,11 +1386,11 @@ class Deck {
           TextSpan(text: 'Zauberer', style: TextStyle(color: CardType.wizard.color)),
           const TextSpan(text: '.')
         ])),
-        ActionCards.none,
         (deck) {
           return amountOf(activeDeck(deck), {CardType.leader, CardType.wizard}, names: {'Hexenmeister'}) * 10;
         }),
     Card(
+        Cards.magierin,
         'Magierin',
         CardType.wizard,
         false,
@@ -1378,11 +1413,11 @@ class Deck {
           TextSpan(text: 'Flamme', style: TextStyle(color: CardType.flame.color)),
           const TextSpan(text: '.')
         ])),
-        ActionCards.none,
         (deck) {
           return 0;
         }),
     Card(
+        Cards.hofnarr,
         'Hofnarr',
         CardType.wizard,
         false,
@@ -1402,7 +1437,6 @@ class Deck {
                 style: TextStyle(color: Colors.black),
                 text:
                     '+3 für jede andere Karte mit einer ungeraden Basisstärke. ODER +50 wenn alle Karten eine ungerade Basisstärke haben.')),
-        ActionCards.none,
         (deck) {
           return 0;
         }),
@@ -1502,15 +1536,13 @@ extension CardTypeExtension on CardType {
   }
 }
 
-enum ActionCards { none, spiegelung, gestaltwandler, doppelganger, bookOfChange, island }
-
 class Card implements Comparable<Card> {
   String name;
   bool hasAction;
   CardType cardType;
   int baseStrength;
   Widget description;
-  ActionCards actionCards;
+  Cards id;
 
   void Function(Map<Card, CardState>) block;
   int Function(Map<Card, CardState>) bonus;
@@ -1524,8 +1556,8 @@ class Card implements Comparable<Card> {
   @override
   int get hashCode => name.hashCode;
 
-  Card(this.name, this.cardType, this.hasAction, this.baseStrength, this.block, this.bonus, this.description,
-      this.actionCards, this.penalty);
+  Card(this.id, this.name, this.cardType, this.hasAction, this.baseStrength, this.block, this.bonus,
+      this.description, this.penalty);
 
   void executeBlock(Map<Card, CardState> deck) {
     block(deck);
@@ -1546,4 +1578,66 @@ class CardState {
   bool visibility;
 
   CardState({this.visibility = false, this.activationState});
+
+  bool isActive() {
+    if (activationState == null) return true;
+    return activationState!;
+  }
+}
+
+enum Cards {
+  koenig,
+  koenigin,
+  prinzessin,
+  kriegsherr,
+  kaiserin,
+  ritter,
+  elbenschuetzen,
+  leichteKavallerie,
+  zwergeninfanterie,
+  waldlaeufer,
+  schildVonKeth,
+  juwelDerOrdnung,
+  weltenbaum,
+  buchDerVeraenderung,
+  runeDesSchutzes,
+  einhorn,
+  basilisk,
+  schlachtross,
+  drache,
+  hydra,
+  buschfeuer,
+  kerze,
+  schmiede,
+  blitz,
+  feuerwesen,
+  quelleDesLebens,
+  sumpf,
+  grosseFlut,
+  insel,
+  wasserwesen,
+  gestaltwandler,
+  spiegelung,
+  doppelgaenger,
+  gebirge,
+  hoehle,
+  glockenturm,
+  wald,
+  erdwesen,
+  kriegsschiff,
+  zauberstab,
+  schwertVonKeth,
+  elbischerBogen,
+  kampfzeppelin,
+  regensturm,
+  blizzard,
+  rauch,
+  wirbelsturm,
+  luftwesen,
+  sammler,
+  herrDerBestien,
+  totenbeschwoerer,
+  hexenmeister,
+  magierin,
+  hofnarr,
 }

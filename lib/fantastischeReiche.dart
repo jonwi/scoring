@@ -1,5 +1,3 @@
-import 'dart:collection';
-
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:scoring/cameraScan.dart';
@@ -19,120 +17,35 @@ class FantastischeReiche extends StatefulWidget {
 
 class HandWidget extends State<FantastischeReiche> {
   /// Card and Active State where true means the card counts towards total and false means its deactivated and visibility
-  final Map<game.Card, game.CardState> _hand =
-      SplayTreeMap<game.Card, game.CardState>((c1, c2) => c1.name.compareTo(c2.name));
+  final Map<game.Card, game.CardState> _hand = {};
   int _sum = 0;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            const Text('Deck'),
-            FittedBox(fit: BoxFit.fitWidth, child: Text('Punkte: $_sum')),
-            Row(children: [
-              Text(
-                '${_hand.length}',
-                style: TextStyle(color: _hand.length > maxCards() ? Colors.red : null),
-              ),
-              Text('/${maxCards()}'),
-            ])
-          ],
-        ),
-      ),
+      appBar: _buildAppBar(),
       body: Center(
         child: ListView.builder(
           // Deck
           itemCount: _hand.length + 1,
           itemBuilder: (context, i) {
             if (i == _hand.length) {
-              return ListTile(
+              return const ListTile(
                 title: SizedBox(
                   height: 100,
                 ),
               );
             } else {
-              game.Card card = _hand.keys.elementAt(i);
+              var entry = _hand.entries.elementAt(i);
+              var card = entry.key;
               return ListTile(
                 onTap: () {
                   setState(() {
-                    _hand[card]!.visibility = !_hand[card]!.visibility;
+                    entry.value.visibility = !entry.value.visibility;
                   });
                 },
-                title: Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    Container(
-                        margin: const EdgeInsets.only(right: 15),
-                        decoration: BoxDecoration(
-                          boxShadow: [BoxShadow(color: card.cardType.color, spreadRadius: 10)],
-                          borderRadius: BorderRadius.circular(16),
-                          color: card.cardType.color,
-                        ),
-                        child: SizedBox(
-                          width: 20,
-                          child: Center(
-                            child: Text(
-                              '${card.baseStrength}',
-                              style: TextStyle(
-                                color: card.cardType.textColor,
-                              ),
-                            ),
-                          ),
-                        )),
-                    Expanded(
-                      flex: 5,
-                      child: Text(card.name,
-                          style: TextStyle(
-                              decoration: _hand[card]?.activationState ?? true
-                                  ? TextDecoration.none
-                                  : TextDecoration.lineThrough)),
-                    ),
-                    card.hasAction
-                        ? Expanded(
-                            flex: 1,
-                            child: IconButton(
-                              icon: const Icon(
-                                Icons.circle,
-                                size: 35,
-                              ),
-                              onPressed: card.hasAction
-                                  ? () {
-                                      _performAction(card);
-                                    }
-                                  : () {},
-                              color: card.hasAction ? Colors.green : Colors.white,
-                            ),
-                          )
-                        : const Spacer(
-                            flex: 1,
-                          ),
-                    Expanded(
-                      flex: 1,
-                      child: Center(
-                        child: Text('${card.bonus(_hand) - card.penalty(_hand)}',
-                            style: TextStyle(
-                                color:
-                                    card.bonus(_hand) - card.penalty(_hand) > 0 ? Colors.green : Colors.red)),
-                      ),
-                    ),
-                    Expanded(
-                      flex: 1,
-                      child: Center(
-                        child: Text('${card.calculateStrength(_hand)}',
-                            style: TextStyle(color: card.bonus(_hand) > 0 ? Colors.green : Colors.red)),
-                      ),
-                    )
-                  ],
-                ),
-                subtitle: AnimatedOpacity(
-                    opacity: _hand[card]!.visibility ? 1.0 : 0,
-                    duration: const Duration(milliseconds: 500),
-                    child: Visibility(
-                        visible: _hand[card]!.visibility,
-                        child: Wrap(children: [Center(child: card.description)]))),
+                title: _buildStats(entry),
+                subtitle: _buildDescription(entry),
                 onLongPress: () => _removeCard(card),
                 trailing: FittedBox(
                   child: IconButton(
@@ -159,42 +72,155 @@ class HandWidget extends State<FantastischeReiche> {
             child: const Text('Alle entfernen')),
       ]),
       floatingActionButton: Column(mainAxisAlignment: MainAxisAlignment.end, children: [
-        FloatingActionButton(
-            heroTag: 'btn1',
-            child: const Icon(Icons.camera_alt),
-            onPressed: () async {
-              WidgetsFlutterBinding.ensureInitialized();
-              final cameras = await availableCameras();
-              final firstCamera = cameras.first;
-              var result = await Navigator.push<Set<String>>(context, MaterialPageRoute(builder: (context) {
-                return CameraScan(camera: firstCamera);
-              }));
-              result?.forEach((element) {
-                _addCard(element);
-              });
-            }),
-        FloatingActionButton(
-          heroTag: 'btn2',
-          child: const Icon(Icons.add),
-          onPressed: () async {
-            final result = await Navigator.push(
-              context,
-              MaterialPageRoute<String>(builder: (context) {
-                return const CardSelector();
-              }),
-            );
-            if (result != null && _hand.length <= 8) {
-              _addCard(result);
-            }
-          },
-        ),
+        _buildScanButton(context),
+        _buildAddButton(context),
       ]),
     );
   }
 
+  /// floating button to go to scanner
+  FloatingActionButton _buildScanButton(BuildContext context) {
+    return FloatingActionButton(
+        heroTag: 'btn1',
+        child: const Icon(Icons.camera_alt),
+        onPressed: () async {
+          WidgetsFlutterBinding.ensureInitialized();
+          final cameras = await availableCameras();
+          final firstCamera = cameras.first;
+          var result = await Navigator.push<Set<String>>(context, MaterialPageRoute(builder: (context) {
+            return CameraScan(camera: firstCamera);
+          }));
+          result?.forEach((element) {
+            _addCard(element);
+          });
+        });
+  }
+
+  /// Floating add button to go to card selector
+  FloatingActionButton _buildAddButton(BuildContext context) {
+    return FloatingActionButton(
+      heroTag: 'btn2',
+      child: const Icon(Icons.add),
+      onPressed: () async {
+        final result = await Navigator.push(
+          context,
+          MaterialPageRoute<String>(builder: (context) {
+            return const CardSelector(); // TODO: remove current hand from selection, this requires a id for every card since everything else can be changed with actions
+          }),
+        );
+        if (result != null && _hand.length <= 8) {
+          _addCard(result);
+        }
+      },
+    );
+  }
+
+  /// description of given card
+  AnimatedOpacity _buildDescription(MapEntry<game.Card, game.CardState> entry) {
+    return AnimatedOpacity(
+        opacity: entry.value.visibility ? 1.0 : 0,
+        duration: const Duration(milliseconds: 500),
+        child: Visibility(
+            visible: entry.value.visibility, child: Wrap(children: [Center(child: entry.key.description)])));
+  }
+
+  /// Stats containing base strength, name, actionButton, bonus and penalty, and overall total
+  Row _buildStats(MapEntry<game.Card, game.CardState> entry) {
+    final card = entry.key;
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.end,
+      children: [
+        Container(
+            // baseStrength
+            margin: const EdgeInsets.only(right: 15),
+            decoration: BoxDecoration(
+              boxShadow: [BoxShadow(color: card.cardType.color, spreadRadius: 10)],
+              borderRadius: BorderRadius.circular(16),
+              color: card.cardType.color,
+            ),
+            child: SizedBox(
+              width: 20,
+              child: Center(
+                child: Text(
+                  '${card.baseStrength}',
+                  style: TextStyle(
+                    color: card.cardType.textColor,
+                  ),
+                ),
+              ),
+            )),
+        Expanded(
+          // name
+          flex: 5,
+          child: Text(card.name,
+              style: TextStyle(
+                  decoration: entry.value.activationState ?? true
+                      ? TextDecoration.none
+                      : TextDecoration.lineThrough)),
+        ),
+        card.hasAction // actionButton
+            ? Expanded(
+                flex: 1,
+                child: IconButton(
+                  icon: const Icon(
+                    Icons.circle,
+                    size: 35,
+                  ),
+                  onPressed: card.hasAction
+                      ? () {
+                          _performAction(card);
+                        }
+                      : () {},
+                  color: card.hasAction ? Colors.green : Colors.white,
+                ),
+              )
+            : const Spacer(
+                flex: 1,
+              ),
+        Expanded(
+          // bonus - penalty
+          flex: 1,
+          child: Center(
+            child: Text('${entry.value.isActive() ? card.bonus(_hand) - card.penalty(_hand) : 0}',
+                style: TextStyle(
+                    color: card.bonus(_hand) - card.penalty(_hand) > 0 ? Colors.green : Colors.red)),
+          ),
+        ),
+        Expanded(
+          // total
+          flex: 1,
+          child: Center(
+            child: Text('${entry.value.isActive() ? card.calculateStrength(_hand) : 0}',
+                style: TextStyle(color: card.bonus(_hand) > 0 ? Colors.green : Colors.red)),
+          ),
+        )
+      ],
+    );
+  }
+
+  /// AppBar containing score total and amount of cards in hand
+  AppBar _buildAppBar() {
+    return AppBar(
+      title: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          const Text('Deck'),
+          FittedBox(fit: BoxFit.fitWidth, child: Text('Punkte: $_sum')),
+          Row(children: [
+            Text(
+              '${_hand.length}',
+              style: TextStyle(color: _hand.length > maxCards() ? Colors.red : null),
+            ),
+            Text('/${maxCards()}'),
+          ])
+        ],
+      ),
+    );
+  }
+
   Future<void> _performAction(card) async {
-    switch (card.actionCards) {
-      case game.ActionCards.spiegelung:
+    switch (card.id) {
+      case game.Cards.spiegelung:
         final cardName = await Navigator.push(context, MaterialPageRoute<String>(builder: (context) {
           return CardSelector(
               selector: (card) => {
@@ -216,12 +242,11 @@ class HandWidget extends State<FantastischeReiche> {
           }.contains(chosen.cardType)) {
             card.name = chosen.name;
             card.cardType = chosen.cardType;
-            setState(() {});
+            print('Spiegelung ausgewählt');
           }
         }
-
         break;
-      case game.ActionCards.gestaltwandler:
+      case game.Cards.gestaltwandler:
         final cardName = await Navigator.push(context, MaterialPageRoute<String>(builder: (context) {
           return CardSelector(
               selector: (card) => {
@@ -243,41 +268,45 @@ class HandWidget extends State<FantastischeReiche> {
           }.contains(chosen.cardType)) {
             card.name = chosen.name;
             card.cardType = chosen.cardType;
-            setState(() {});
+            print('gestaltwandler ausgewahlt');
           }
         }
         break;
-      case game.ActionCards.doppelganger:
+      case game.Cards.doppelgaenger:
         final cardName = await Navigator.push(context, MaterialPageRoute<String>(builder: (context) {
           return CardSelector(
             selector: (card) =>
-                _hand.keys.map((e) => e.name).contains(card.name) &&
-                card.actionCards != game.ActionCards.doppelganger,
+                _hand.keys.map((e) => e.name).contains(card.name) && card.id != game.Cards.doppelgaenger,
           );
         }));
         if (cardName != null) {
           game.Card chosen = _hand.keys.where((element) => element.name == cardName).elementAt(0);
           card.name = chosen.name;
+          // TODO hier muss noch eine penalty gemacht werden
           // card.penalty = chosen.penalty;
           card.cardType = chosen.cardType;
           card.baseStrength = chosen.baseStrength;
+          print('doppelgänger ausgewählt');
         }
         break;
-      case game.ActionCards.bookOfChange:
+      case game.Cards.buchDerVeraenderung:
         final cardName = await Navigator.push(context, MaterialPageRoute<String>(builder: (context) {
           return CardSelector(
-            selector: (card) => _hand.keys.map((e) => e.name).contains(card.name),
+            selector: (c) => _hand.keys.map((e) => e.name).contains(c.name) && c.name != card.name,
           );
         }));
-        final cardType = await Navigator.push(context, MaterialPageRoute<game.CardType>(builder: (context) {
-          return TypeSelector(selector: (type) => type != game.CardType.wild);
-        }));
-        if (cardName != null && cardType != null) {
-          game.Card chosen = _hand.keys.where((element) => element.name == cardName).first;
-          chosen.cardType = cardType;
+        if (cardName != null) {
+          final cardType = await Navigator.push(context, MaterialPageRoute<game.CardType>(builder: (context) {
+            return TypeSelector(selector: (type) => type != game.CardType.wild);
+          }));
+          if (cardType != null) {
+            game.Card chosen = _hand.keys.where((element) => element.name == cardName).first;
+            chosen.cardType = cardType;
+          }
         }
+        print('book of change ausgewahlt');
         break;
-      case game.ActionCards.island:
+      case game.Cards.insel:
         final cardName = await Navigator.push(context, MaterialPageRoute<String>(builder: (context) {
           return CardSelector(
             selector: (card) =>
@@ -290,42 +319,42 @@ class HandWidget extends State<FantastischeReiche> {
           _hand[chosen]?.activationState = true;
           chosen.penalty = (deck) => 0;
         }
+        print('insel ausgweal');
         break;
     }
-    setState(() {
-      _calculateDeck();
-    });
+    _calculateDeck();
   }
 
   void _addCard(String cardName) {
-    setState(() {
-      game.Card card = game.Deck().cards.firstWhere((element) => element.name == cardName);
-      if (!_hand.keys.map((card) => card.name).contains(card.name)) {
-        _hand[card] = game.CardState();
-        _calculateDeck();
-      }
-    });
+    game.Card card = game.Deck().cards.firstWhere((element) => element.name == cardName);
+    //TODO: Better with ID
+    if (!_hand.keys.map((card) => card.name).contains(card.name)) {
+      _hand[card] = game.CardState();
+      _calculateDeck();
+    }
   }
 
   void _removeCard(game.Card card) {
-    setState(() {
-      _hand.remove(card);
-      _calculateDeck();
-    });
+    _hand.remove(card);
+    _calculateDeck();
   }
 
   void _calculateDeck() {
+    print('Start calculation');
     setState(() {
-      for (var key in _hand.keys) {
-        _hand[key]?.activationState = null;
+      for (var entry in _hand.entries) {
+        print(entry.key.name);
+        entry.value.activationState = null;
       }
       for (var key in _hand.keys) {
         key.block(_hand);
       }
-      _sum = _hand.keys
-          .where((e) => _hand[e]?.activationState == null || _hand[e]?.activationState == true)
-          .fold(0, (previousValue, element) => previousValue + element.calculateStrength(_hand));
+      _sum = _hand.entries
+          .where((e) => e.value.activationState == null || e.value.activationState == true)
+          .fold(0, (previousValue, element) => previousValue + element.key.calculateStrength(_hand));
+      print('finish state');
     });
+    print('finish calc');
   }
 
   int maxCards() {
@@ -334,17 +363,10 @@ class HandWidget extends State<FantastischeReiche> {
   }
 
   void _resetActions() {
-    for (var key in _hand.keys.toList()) {
-      if (key.actionCards != game.ActionCards.none) {
-        game.Card card = game.Deck().cards.where((element) => element.actionCards == key.actionCards).first;
-        _hand[card] = _hand.remove(key)!;
-      } else {
-        game.Card card = game.Deck().cards.where((element) => element.name == key.name).first;
-        _hand[card] = _hand.remove(key)!;
-      }
+    for (var entry in _hand.entries.toList()) {
+      game.Card card = game.Deck().cards.firstWhere((element) => element.id == entry.key.id);
+      _hand[card] = _hand.remove(entry.key)!;
     }
-    setState(() {
-      _calculateDeck();
-    });
+    _calculateDeck();
   }
 }
