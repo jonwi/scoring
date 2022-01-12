@@ -47,15 +47,6 @@ class HandWidget extends State<FantastischeReiche> {
                 title: _buildStats(entry),
                 subtitle: _buildDescription(entry),
                 onLongPress: () => _removeCard(card),
-                trailing: FittedBox(
-                  child: IconButton(
-                    icon: const Icon(
-                      Icons.remove_circle_outline_sharp,
-                      color: Colors.red,
-                    ),
-                    onPressed: () => _removeCard(card),
-                  ),
-                ),
               );
             }
           },
@@ -193,7 +184,16 @@ class HandWidget extends State<FantastischeReiche> {
             child: Text('${entry.value.isActive() ? card.calculateStrength(_hand) : 0}',
                 style: TextStyle(color: card.bonus(_hand) > 0 ? Colors.green : Colors.red)),
           ),
-        )
+        ),
+        FittedBox(
+          child: IconButton(
+            icon: const Icon(
+              Icons.remove_circle_outline_sharp,
+              color: Colors.red,
+            ),
+            onPressed: () => _removeCard(card),
+          ),
+        ),
       ],
     );
   }
