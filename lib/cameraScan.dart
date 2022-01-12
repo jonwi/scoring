@@ -65,7 +65,7 @@ class TakePictureScreenState extends State<CameraScan> {
             itemBuilder: (context, index) {
               var list = _cards.entries.toList();
               list.sort((e1, e2) => e1.value.compareTo(e2.value));
-              var name = list.elementAt(index).key.name;
+              var name = list.elementAt(index).key.cardName;
               return ListTile(
                 title: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
                   Container(

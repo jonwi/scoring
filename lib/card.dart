@@ -8,7 +8,7 @@ class Deck {
   List<Card> cards = [
     Card(
         Cards.koenig,
-        'König',
+        Cards.koenig.cardName,
         CardType.leader,
         false,
         8,
@@ -39,7 +39,7 @@ class Deck {
         }),
     Card(
         Cards.koenigin,
-        'Königin',
+        Cards.koenigin.cardName,
         CardType.leader,
         false,
         6,
@@ -70,7 +70,7 @@ class Deck {
         }),
     Card(
         Cards.prinzessin,
-        'Prinzessin',
+        Cards.prinzessin.cardName,
         CardType.leader,
         false,
         2,
@@ -95,7 +95,7 @@ class Deck {
         }),
     Card(
         Cards.kriegsherr,
-        'Kriegsherr',
+        Cards.kriegsherr.cardName,
         CardType.leader,
         false,
         4,
@@ -117,7 +117,7 @@ class Deck {
         }),
     Card(
         Cards.kaiserin,
-        'Kaiserin',
+        Cards.kaiserin.cardName,
         CardType.leader,
         false,
         15,
@@ -138,7 +138,7 @@ class Deck {
         }),
     Card(
         Cards.ritter,
-        'Ritter',
+        Cards.ritter.cardName,
         CardType.army,
         false,
         20,
@@ -160,7 +160,7 @@ class Deck {
         }),
     Card(
         Cards.elbenschuetzen,
-        'Elbenschützen',
+        Cards.elbenschuetzen.cardName,
         CardType.army,
         false,
         10,
@@ -182,7 +182,7 @@ class Deck {
         }),
     Card(
         Cards.leichteKavallerie,
-        'Leichte Kavallerie',
+        Cards.leichteKavallerie.cardName,
         CardType.army,
         false,
         17,
@@ -201,7 +201,7 @@ class Deck {
         }),
     Card(
         Cards.zwergeninfanterie,
-        'Zwergeninfanterie',
+        Cards.zwergeninfanterie.cardName,
         CardType.army,
         false,
         15,
@@ -221,7 +221,7 @@ class Deck {
         }),
     Card(
         Cards.waldlaeufer,
-        'Waldläufer',
+        Cards.waldlaeufer.cardName,
         CardType.army,
         false,
         5,
@@ -242,7 +242,7 @@ class Deck {
         }),
     Card(
         Cards.schildVonKeth,
-        'Schild von Keth',
+        Cards.schildVonKeth.cardName,
         CardType.artifact,
         false,
         4,
@@ -271,7 +271,7 @@ class Deck {
         }),
     Card(
         Cards.juwelDerOrdnung,
-        'Juwel der Ordnung',
+        Cards.juwelDerOrdnung.cardName,
         CardType.artifact,
         false,
         5,
@@ -319,7 +319,7 @@ class Deck {
         }),
     Card(
         Cards.weltenbaum,
-        'Weltenbaum',
+        Cards.weltenbaum.cardName,
         CardType.artifact,
         false,
         2,
@@ -341,7 +341,7 @@ class Deck {
         }),
     Card(
         Cards.buchDerVeraenderung,
-        'Buch der Veränderung',
+        Cards.buchDerVeraenderung.cardName,
         CardType.artifact,
         true,
         3,
@@ -359,7 +359,7 @@ class Deck {
         }),
     Card(
         Cards.runeDesSchutzes,
-        'Rune des Schutzes',
+        Cards.runeDesSchutzes.cardName,
         CardType.artifact,
         false,
         1,
@@ -379,7 +379,7 @@ class Deck {
         }),
     Card(
         Cards.einhorn,
-        'Einhorn',
+        Cards.einhorn.cardName,
         CardType.beast,
         false,
         9,
@@ -411,7 +411,7 @@ class Deck {
         }),
     Card(
         Cards.basilisk,
-        'Basilisk',
+        Cards.basilisk.cardName,
         CardType.beast,
         false,
         35,
@@ -443,7 +443,7 @@ class Deck {
         }),
     Card(
         Cards.schlachtross,
-        'Schlachtross',
+        Cards.schlachtross.cardName,
         CardType.beast,
         false,
         6,
@@ -467,7 +467,7 @@ class Deck {
         }),
     Card(
         Cards.drache,
-        'Drache',
+        Cards.drache.cardName,
         CardType.beast,
         false,
         30,
@@ -489,7 +489,7 @@ class Deck {
         }),
     Card(
         Cards.hydra,
-        'Hydra',
+        Cards.hydra.cardName,
         CardType.beast,
         false,
         12,
@@ -511,7 +511,7 @@ class Deck {
         }),
     Card(
         Cards.buschfeuer,
-        'Buschfeuer',
+        Cards.buschfeuer.cardName,
         CardType.flame,
         false,
         40,
@@ -565,7 +565,7 @@ class Deck {
         }),
     Card(
         Cards.kerze,
-        'Kerze',
+        Cards.kerze.cardName,
         CardType.flame,
         false,
         2,
@@ -594,7 +594,7 @@ class Deck {
         }),
     Card(
         Cards.schmiede,
-        'Schmiede',
+        Cards.schmiede.cardName,
         CardType.flame,
         false,
         9,
@@ -615,7 +615,7 @@ class Deck {
         }),
     Card(
         Cards.blitz,
-        'Blitz',
+        Cards.blitz.cardName,
         CardType.flame,
         false,
         11,
@@ -635,7 +635,7 @@ class Deck {
         }),
     Card(
         Cards.feuerwesen,
-        'Feuerwesen',
+        Cards.feuerwesen.cardName,
         CardType.flame,
         false,
         4,
@@ -654,7 +654,7 @@ class Deck {
         }),
     Card(
         Cards.quelleDesLebens,
-        'Quelle des Lebens',
+        Cards.quelleDesLebens.cardName,
         CardType.flood,
         false,
         1,
@@ -690,7 +690,7 @@ class Deck {
         }),
     Card(
         Cards.sumpf,
-        'Sumpf',
+        Cards.sumpf.cardName,
         CardType.flood,
         false,
         18,
@@ -717,7 +717,7 @@ class Deck {
         }),
     Card(
         Cards.grosseFlut,
-        'Große Flut',
+        Cards.grosseFlut.cardName,
         CardType.flood,
         false,
         32,
@@ -764,7 +764,7 @@ class Deck {
         }),
     Card(
         Cards.insel,
-        'Insel',
+        Cards.insel.cardName,
         CardType.flood,
         true,
         14,
@@ -785,7 +785,7 @@ class Deck {
         }),
     Card(
         Cards.wasserwesen,
-        'Wasserwesen',
+        Cards.wasserwesen.cardName,
         CardType.flood,
         false,
         4,
@@ -844,7 +844,7 @@ class Deck {
         (deck) => 0),
     Card(
         Cards.doppelgaenger,
-        'Doppelgänger',
+        Cards.doppelgaenger.cardName,
         CardType.wild,
         true,
         0,
@@ -862,7 +862,7 @@ class Deck {
         }),
     Card(
         Cards.gebirge,
-        'Gebirge',
+        Cards.gebirge.cardName,
         CardType.land,
         false,
         9,
@@ -895,7 +895,7 @@ class Deck {
         }),
     Card(
         Cards.hoehle,
-        'Höhle',
+        Cards.hoehle.cardName,
         CardType.land,
         false,
         6,
@@ -928,7 +928,7 @@ class Deck {
         }),
     Card(
         Cards.glockenturm,
-        'Glockenturm',
+        Cards.glockenturm.cardName,
         CardType.land,
         false,
         8,
@@ -950,7 +950,7 @@ class Deck {
         }),
     Card(
         Cards.wald,
-        'Wald',
+        Cards.wald.cardName,
         CardType.land,
         false,
         7,
@@ -972,7 +972,7 @@ class Deck {
         }),
     Card(
         Cards.erdwesen,
-        'Erdwesen',
+        Cards.erdwesen.cardName,
         CardType.land,
         false,
         4,
@@ -991,7 +991,7 @@ class Deck {
         }),
     Card(
         Cards.kriegsschiff,
-        'Kriegsschiff',
+        Cards.kriegsschiff.cardName,
         CardType.weapon,
         false,
         23,
@@ -1020,7 +1020,7 @@ class Deck {
         }),
     Card(
         Cards.zauberstab,
-        'Zauberstab',
+        Cards.zauberstab.cardName,
         CardType.weapon,
         false,
         1,
@@ -1042,7 +1042,7 @@ class Deck {
         }),
     Card(
         Cards.schwertVonKeth,
-        'Schwert von Keth',
+        Cards.schwertVonKeth.cardName,
         CardType.weapon,
         false,
         7,
@@ -1072,7 +1072,7 @@ class Deck {
         }),
     Card(
         Cards.elbischerBogen,
-        'Elbischer Bogen',
+        Cards.elbischerBogen.cardName,
         CardType.weapon,
         false,
         3,
@@ -1101,7 +1101,7 @@ class Deck {
         }),
     Card(
         Cards.kampfzeppelin,
-        'Kampfzeppelin',
+        Cards.kampfzeppelin.cardName,
         CardType.weapon,
         false,
         35,
@@ -1133,7 +1133,7 @@ class Deck {
         }),
     Card(
         Cards.regensturm,
-        'Regensturm',
+        Cards.regensturm.cardName,
         CardType.weather,
         false,
         8,
@@ -1164,7 +1164,7 @@ class Deck {
         }),
     Card(
         Cards.blizzard,
-        'Blizzard',
+        Cards.blizzard.cardName,
         CardType.weather,
         false,
         30,
@@ -1205,7 +1205,7 @@ class Deck {
         }),
     Card(
         Cards.rauch,
-        'Rauch',
+        Cards.rauch.cardName,
         CardType.weather,
         false,
         27,
@@ -1234,7 +1234,7 @@ class Deck {
         }),
     Card(
         Cards.wirbelsturm,
-        'Wirbelsturm',
+        Cards.wirbelsturm.cardName,
         CardType.weather,
         false,
         13,
@@ -1262,7 +1262,7 @@ class Deck {
         }),
     Card(
         Cards.luftwesen,
-        'Luftwesen',
+        Cards.luftwesen.cardName,
         CardType.weather,
         false,
         4,
@@ -1281,7 +1281,7 @@ class Deck {
         }),
     Card(
         Cards.sammler,
-        'Sammler',
+        Cards.sammler.cardName,
         CardType.wizard,
         false,
         7,
@@ -1318,7 +1318,7 @@ class Deck {
         }),
     Card(
         Cards.herrDerBestien,
-        'Herr der Bestien',
+        Cards.herrDerBestien.cardName,
         CardType.wizard,
         false,
         9,
@@ -1345,7 +1345,7 @@ class Deck {
         }),
     Card(
         Cards.totenbeschwoerer,
-        'Totenbeschwörer',
+        Cards.totenbeschwoerer.cardName,
         CardType.wizard,
         false,
         3,
@@ -1370,7 +1370,7 @@ class Deck {
         }),
     Card(
         Cards.hexenmeister,
-        'Hexenmeister',
+        Cards.hexenmeister.cardName,
         CardType.wizard,
         false,
         25,
@@ -1392,7 +1392,7 @@ class Deck {
         }),
     Card(
         Cards.magierin,
-        'Magierin',
+        Cards.magierin.cardName,
         CardType.wizard,
         false,
         5,
@@ -1419,7 +1419,7 @@ class Deck {
         }),
     Card(
         Cards.hofnarr,
-        'Hofnarr',
+        Cards.hofnarr.cardName,
         CardType.wizard,
         false,
         3,
@@ -1629,4 +1629,122 @@ enum Cards {
   hexenmeister,
   magierin,
   hofnarr,
+}
+
+extension CardsExtension on Cards {
+  String get cardName {
+    switch (this) {
+      case Cards.koenig:
+        return 'König';
+      case Cards.koenigin:
+        return 'Königin';
+      case Cards.prinzessin:
+        return 'Prinzessin';
+      case Cards.kriegsherr:
+        return 'Kriegsherr';
+      case Cards.kaiserin:
+        return 'Kaiserin';
+      case Cards.ritter:
+        return 'Ritter';
+      case Cards.elbenschuetzen:
+        return 'Elbenschützen';
+      case Cards.leichteKavallerie:
+        return 'Leichte Kavallerie';
+      case Cards.zwergeninfanterie:
+        return 'Zwergeninfanterie';
+      case Cards.waldlaeufer:
+        return 'Waldläufer';
+      case Cards.schildVonKeth:
+        return 'Schild von Keth';
+      case Cards.juwelDerOrdnung:
+        return 'Juwel der Ordnung';
+      case Cards.weltenbaum:
+        return 'Weltenbaum';
+      case Cards.buchDerVeraenderung:
+        return 'Buch der Veränderung';
+      case Cards.runeDesSchutzes:
+        return 'Rune des Schutzes';
+      case Cards.einhorn:
+        return 'Einhorn';
+      case Cards.basilisk:
+        return 'Basilisk';
+      case Cards.schlachtross:
+        return 'Schlachtross';
+      case Cards.drache:
+        return 'Drache';
+      case Cards.hydra:
+        return 'Hydra';
+      case Cards.buschfeuer:
+        return 'Buschfeuer';
+      case Cards.kerze:
+        return 'Kerze';
+      case Cards.schmiede:
+        return 'Schmiede';
+      case Cards.blitz:
+        return 'Blitz';
+      case Cards.feuerwesen:
+        return 'Feuerwesen';
+      case Cards.quelleDesLebens:
+        return 'Quelle des Lebens';
+      case Cards.sumpf:
+        return 'Sumpf';
+      case Cards.grosseFlut:
+        return 'Große Flut';
+      case Cards.insel:
+        return 'Insel';
+      case Cards.wasserwesen:
+        return 'Wasserwesen';
+      case Cards.gestaltwandler:
+        return 'Gestaltwandler';
+      case Cards.spiegelung:
+        return 'Spiegelung';
+      case Cards.doppelgaenger:
+        return 'Doppelgänger';
+      case Cards.gebirge:
+        return 'Gebirge';
+      case Cards.hoehle:
+        return 'Höhle';
+      case Cards.glockenturm:
+        return 'Glockenturm';
+      case Cards.wald:
+        return 'Wald';
+      case Cards.erdwesen:
+        return 'Erdwesen';
+      case Cards.kriegsschiff:
+        return 'Kriegsschiff';
+      case Cards.zauberstab:
+        return 'Zauberstab';
+      case Cards.schwertVonKeth:
+        return 'Schwert von Keth';
+      case Cards.elbischerBogen:
+        return 'Elbischer Bogen';
+      case Cards.kampfzeppelin:
+        return 'Kampfzeppelin';
+      case Cards.regensturm:
+        return 'Regensturm';
+      case Cards.blizzard:
+        return 'Blizzard';
+      case Cards.rauch:
+        return 'Rauch';
+      case Cards.wirbelsturm:
+        return 'Wirbelsturm';
+      case Cards.luftwesen:
+        return 'Luftwesen';
+      case Cards.sammler:
+        return 'Sammler';
+      case Cards.herrDerBestien:
+        return 'Herr der Bestien';
+      case Cards.totenbeschwoerer:
+        return 'Totenbeschwörer';
+      case Cards.hexenmeister:
+        return 'Hexenmeister';
+      case Cards.magierin:
+        return 'Magierin';
+      case Cards.hofnarr:
+        return 'Hofnarr';
+
+      default:
+        return 'Unknown Card';
+    }
+  }
 }
