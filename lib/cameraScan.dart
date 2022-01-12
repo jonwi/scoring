@@ -2,6 +2,7 @@ import 'package:camera/camera.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_ml_kit/google_ml_kit.dart';
+import 'package:string_similarity/src/extensions/string_extensions.dart';
 
 import 'card.dart';
 
@@ -136,24 +137,21 @@ class TakePictureScreenState extends State<CameraScan> {
 
   Future<void> _scan() async {
     try {
-      final firstMessure = DateTime.now().millisecondsSinceEpoch;
       await _initializeControllerFuture;
       final cameraImage = await _controller.takePicture();
       final inputImage = InputImage.fromFilePath(cameraImage.path);
 
-      final secondMessure = DateTime.now().millisecondsSinceEpoch;
       final RecognisedText recognisedText = await _textDetector.processImage(inputImage);
-      final thirdMessure = DateTime.now().millisecondsSinceEpoch;
       List<String> foundCards = [];
       print(recognisedText.text);
       for (TextBlock block in recognisedText.blocks) {
         for (TextLine line in block.lines) {
           var list = Deck().cards.map((card) => card.id).where((id) {
             final String text = line.text.replaceAll(RegExp('[0-9 ,.)]'), '');
-
+            var similarityTo = text.similarityTo(id.cardName.replaceAll(' ', ''));
             if (text == id.cardName.replaceAll(' ', '')) {
               return true;
-            } else if (aliases.containsKey(text) && aliases[text] == id) {
+            } else if (id != Cards.koenig && id != Cards.koenigin && similarityTo > .7) {
               return true;
             } else {
               var a = text.replaceAll(RegExp('[MTHhbtä]'), '').toLowerCase();
@@ -180,10 +178,6 @@ class TakePictureScreenState extends State<CameraScan> {
         _cards.putIfAbsent(
             Deck().cards.firstWhere((element) => element.name == name).id, () => _cards.length);
       }
-      final lastMessre = DateTime.now().millisecondsSinceEpoch;
-      print(secondMessure - firstMessure);
-      print(thirdMessure - secondMessure);
-      print(lastMessre - thirdMessure);
       setState(() {});
     } catch (e) {
       // If an error occurs, log the error to the console.
@@ -193,5 +187,3 @@ class TakePictureScreenState extends State<CameraScan> {
     }
   }
 }
-
-Map<String, Cards> aliases = {'BuchderVeränderurng': Cards.buchDerVeraenderung};
