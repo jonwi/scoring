@@ -1040,12 +1040,11 @@ class Deck {
         false,
         23,
         (deck) {
-          if (!deckContainsType(deck, CardType.flood)) {
-            deck.keys.where((element) => element.name == 'Kriegsschiff').forEach((element) {
-              if (deck[element]?.activationState == null) {
-                deck[element]?.activationState = false;
-              }
-            });
+          if (amountOf(activeDeck(deck), {CardType.flood}) == 0) {
+            final card = deck.keys.where((card) => card.id == Cards.kriegsschiff).first;
+            if (deck[card]?.activationState == null) {
+              deck[card]?.activationState = false;
+            }
           }
         },
         (deck) {
@@ -1053,6 +1052,9 @@ class Deck {
         },
         RichText(
             text: TextSpan(style: const TextStyle(color: Colors.black), children: [
+          const TextSpan(text: 'Ist BLOCKIERT wenn ohne '),
+          TextSpan(text: 'Flut', style: TextStyle(color: CardType.flood.color)),
+          const TextSpan(text: '.'),
           const TextSpan(text: 'HEBT das Wort '),
           TextSpan(text: 'Armee', style: TextStyle(color: CardType.army.color)),
           const TextSpan(text: ' von allen Strafen auf allen '),
