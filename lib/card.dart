@@ -36,7 +36,8 @@ class Deck {
         )),
         (deck) {
           return 0;
-        }),
+        },
+        aufheben: (deck) {}),
     Card(
         Cards.koenigin,
         Cards.koenigin.cardName,
@@ -67,7 +68,8 @@ class Deck {
         )),
         (deck) {
           return 0;
-        }),
+        },
+        aufheben: (deck) {}),
     Card(
         Cards.prinzessin,
         Cards.prinzessin.cardName,
@@ -92,7 +94,8 @@ class Deck {
         ])),
         (deck) {
           return 0;
-        }),
+        },
+        aufheben: (deck) {}),
     Card(
         Cards.kriegsherr,
         Cards.kriegsherr.cardName,
@@ -114,7 +117,8 @@ class Deck {
         ])),
         (deck) {
           return 0;
-        }),
+        },
+        aufheben: (deck) {}),
     Card(
         Cards.kaiserin,
         Cards.kaiserin.cardName,
@@ -135,7 +139,8 @@ class Deck {
         ])),
         (deck) {
           return 5 * amountOf(activeDeck(deck), {CardType.leader}, ids: {Cards.kaiserin});
-        }),
+        },
+        aufheben: (deck) {}),
     Card(
         Cards.ritter,
         Cards.ritter.cardName,
@@ -157,7 +162,8 @@ class Deck {
             return 0;
           }
           return 8;
-        }),
+        },
+        aufheben: (deck) {}),
     Card(
         Cards.elbenschuetzen,
         Cards.elbenschuetzen.cardName,
@@ -179,7 +185,8 @@ class Deck {
         ])),
         (deck) {
           return 0;
-        }),
+        },
+        aufheben: (deck) {}),
     Card(
         Cards.leichteKavallerie,
         Cards.leichteKavallerie.cardName,
@@ -198,7 +205,8 @@ class Deck {
         ])),
         (deck) {
           return amountOf(activeDeck(deck), {CardType.land}, ids: {Cards.leichteKavallerie}) * 2;
-        }),
+        },
+        aufheben: (deck) {}),
     Card(
         Cards.zwergeninfanterie,
         Cards.zwergeninfanterie.cardName,
@@ -218,7 +226,8 @@ class Deck {
         ])),
         (deck) {
           return 0;
-        }),
+        },
+        aufheben: (deck) {}),
     Card(
         Cards.waldlaeufer,
         Cards.waldlaeufer.cardName,
@@ -239,7 +248,8 @@ class Deck {
         ])),
         (deck) {
           return 0;
-        }),
+        },
+        aufheben: (deck) {}),
     Card(
         Cards.schildVonKeth,
         Cards.schildVonKeth.cardName,
@@ -268,7 +278,8 @@ class Deck {
         ])),
         (deck) {
           return 0;
-        }),
+        },
+        aufheben: (deck) {}),
     Card(
         Cards.juwelDerOrdnung,
         Cards.juwelDerOrdnung.cardName,
@@ -318,7 +329,8 @@ class Deck {
                     '+10 für eine "Strasse" von 3 Karten, +30 für 4 Karten, +60 für 5 Karten, + 100 für 6 Karten, +150 für 7 Karten.')),
         (deck) {
           return 0;
-        }),
+        },
+        aufheben: (deck) {}),
     Card(
         Cards.weltenbaum,
         Cards.weltenbaum.cardName,
@@ -340,7 +352,8 @@ class Deck {
                 text: '+50 wenn jede Nicht-Blockierte Karte eine unterschiedliche Farbe hat.')),
         (deck) {
           return 0;
-        }),
+        },
+        aufheben: (deck) {}),
     Card(
         Cards.buchDerVeraenderung,
         Cards.buchDerVeraenderung.cardName,
@@ -358,7 +371,8 @@ class Deck {
                     'Du darfst die Farbe einer anderen Karte verändern. Name, Bonus, Strafe und Basisstärke bleiben unverändert')),
         (deck) {
           return 0;
-        }),
+        },
+        aufheben: (deck) {}),
     Card(
         Cards.runeDesSchutzes,
         Cards.runeDesSchutzes.cardName,
@@ -378,7 +392,8 @@ class Deck {
                 style: TextStyle(color: Colors.black), text: 'HEBT die Strafen auf allen Karten AUF.')),
         (deck) {
           return 0;
-        }),
+        },
+        aufheben: (deck) {}),
     Card(
         Cards.einhorn,
         Cards.einhorn.cardName,
@@ -410,7 +425,8 @@ class Deck {
         ])),
         (deck) {
           return 0;
-        }),
+        },
+        aufheben: (deck) {}),
     Card(
         Cards.basilisk,
         Cards.basilisk.cardName,
@@ -442,7 +458,8 @@ class Deck {
         ])),
         (deck) {
           return 0;
-        }),
+        },
+        aufheben: (deck) {}),
     Card(
         Cards.schlachtross,
         Cards.schlachtross.cardName,
@@ -466,7 +483,8 @@ class Deck {
         ])),
         (deck) {
           return 0;
-        }),
+        },
+        aufheben: (deck) {}),
     Card(
         Cards.drache,
         Cards.drache.cardName,
@@ -488,7 +506,8 @@ class Deck {
             return 0;
           }
           return 40;
-        }),
+        },
+        aufheben: (deck) {}),
     Card(
         Cards.hydra,
         Cards.hydra.cardName,
@@ -510,7 +529,8 @@ class Deck {
         ])),
         (deck) {
           return 0;
-        }),
+        },
+        aufheben: (deck) {}),
     Card(
         Cards.buschfeuer,
         Cards.buschfeuer.cardName,
@@ -564,7 +584,8 @@ class Deck {
         ])),
         (deck) {
           return 0;
-        }),
+        },
+        aufheben: (deck) {}),
     Card(
         Cards.kerze,
         Cards.kerze.cardName,
@@ -593,7 +614,8 @@ class Deck {
         ])),
         (deck) {
           return 0;
-        }),
+        },
+        aufheben: (deck) {}),
     Card(
         Cards.schmiede,
         Cards.schmiede.cardName,
@@ -614,7 +636,8 @@ class Deck {
         ])),
         (deck) {
           return 0;
-        }),
+        },
+        aufheben: (deck) {}),
     Card(
         Cards.blitz,
         Cards.blitz.cardName,
@@ -634,7 +657,8 @@ class Deck {
                 children: [TextSpan(text: '+30 mit '), TextSpan(text: 'Regensturm'), TextSpan(text: '.')])),
         (deck) {
           return 0;
-        }),
+        },
+        aufheben: (deck) {}),
     Card(
         Cards.feuerwesen,
         Cards.feuerwesen.cardName,
@@ -653,7 +677,8 @@ class Deck {
         ])),
         (deck) {
           return 0;
-        }),
+        },
+        aufheben: (deck) {}),
     Card(
         Cards.quelleDesLebens,
         Cards.quelleDesLebens.cardName,
@@ -689,7 +714,8 @@ class Deck {
         ])),
         (deck) {
           return 0;
-        }),
+        },
+        aufheben: (deck) {}),
     Card(
         Cards.sumpf,
         Cards.sumpf.cardName,
@@ -716,7 +742,8 @@ class Deck {
           } else {
             return 3 * amountOf(aDeck, {CardType.flame, CardType.army});
           }
-        }),
+        },
+        aufheben: (deck) {}),
     Card(
         Cards.grosseFlut,
         Cards.grosseFlut.cardName,
@@ -761,7 +788,8 @@ class Deck {
         ])),
         (deck) {
           return 0;
-        }),
+        },
+        aufheben: (deck) {}),
     Card(
         Cards.insel,
         Cards.insel.cardName,
@@ -782,7 +810,8 @@ class Deck {
         ])),
         (deck) {
           return 0;
-        }),
+        },
+        aufheben: (deck) {}),
     Card(
         Cards.wasserwesen,
         Cards.wasserwesen.cardName,
@@ -801,7 +830,8 @@ class Deck {
         ])),
         (deck) {
           return 0;
-        }),
+        },
+        aufheben: (deck) {}),
     Card(Cards.gestaltwandler, Cards.gestaltwandler.cardName, CardType.wild, true, 0, (deck) {}, (deck) {
       return 0;
     },
@@ -821,7 +851,8 @@ class Deck {
               text:
                   ' des Spiels kopieren. Übernimmt nicht Bonus, Strafen oder Basisstärke der entsprechenden Karte.')
         ])),
-        (deck) => 0),
+        (deck) => 0,
+        aufheben: (deck) {}),
     Card(Cards.spiegelung, 'Spiegelung', CardType.wild, true, 0, (deck) {}, (deck) {
       return 0;
     },
@@ -841,7 +872,8 @@ class Deck {
               text:
                   ' im Spiel kopieren. Übernimmt nicht Bonus, Strafen oder Basisstärke der entsprechenden Karte.')
         ])),
-        (deck) => 0),
+        (deck) => 0,
+        aufheben: (deck) {}),
     Card(
         Cards.doppelgaenger,
         Cards.doppelgaenger.cardName,
@@ -859,7 +891,8 @@ class Deck {
                     'Kann Namen, Basisstärke, Farbe und Strafe ABER NICHT DEN BONUS einer anderen Karte in deiner Hand kopieren.')),
         (deck) {
           return 0;
-        }),
+        },
+        aufheben: (deck) {}),
     Card(
         Cards.gebirge,
         Cards.gebirge.cardName,
@@ -892,7 +925,8 @@ class Deck {
         ])),
         (deck) {
           return 0;
-        }),
+        },
+        aufheben: (deck) {}),
     Card(
         Cards.hoehle,
         Cards.hoehle.cardName,
@@ -925,7 +959,8 @@ class Deck {
         ])),
         (deck) {
           return 0;
-        }),
+        },
+        aufheben: (deck) {}),
     Card(
         Cards.glockenturm,
         Cards.glockenturm.cardName,
@@ -947,7 +982,8 @@ class Deck {
         ])),
         (deck) {
           return 0;
-        }),
+        },
+        aufheben: (deck) {}),
     Card(
         Cards.wald,
         Cards.wald.cardName,
@@ -969,7 +1005,8 @@ class Deck {
         ])),
         (deck) {
           return 0;
-        }),
+        },
+        aufheben: (deck) {}),
     Card(
         Cards.erdwesen,
         Cards.erdwesen.cardName,
@@ -988,7 +1025,8 @@ class Deck {
         ])),
         (deck) {
           return 0;
-        }),
+        },
+        aufheben: (deck) {}),
     Card(
         Cards.kriegsschiff,
         Cards.kriegsschiff.cardName,
@@ -1017,7 +1055,8 @@ class Deck {
         ])),
         (deck) {
           return 0;
-        }),
+        },
+        aufheben: (deck) {}),
     Card(
         Cards.zauberstab,
         Cards.zauberstab.cardName,
@@ -1039,7 +1078,8 @@ class Deck {
         ])),
         (deck) {
           return 0;
-        }),
+        },
+        aufheben: (deck) {}),
     Card(
         Cards.schwertVonKeth,
         Cards.schwertVonKeth.cardName,
@@ -1069,7 +1109,8 @@ class Deck {
         ])),
         (deck) {
           return 0;
-        }),
+        },
+        aufheben: (deck) {}),
     Card(
         Cards.elbischerBogen,
         Cards.elbischerBogen.cardName,
@@ -1098,7 +1139,8 @@ class Deck {
         ])),
         (deck) {
           return 0;
-        }),
+        },
+        aufheben: (deck) {}),
     Card(
         Cards.kampfzeppelin,
         Cards.kampfzeppelin.cardName,
@@ -1130,7 +1172,8 @@ class Deck {
         ])),
         (deck) {
           return 0;
-        }),
+        },
+        aufheben: (deck) {}),
     Card(
         Cards.regensturm,
         Cards.regensturm.cardName,
@@ -1161,7 +1204,8 @@ class Deck {
         ])),
         (deck) {
           return 0;
-        }),
+        },
+        aufheben: (deck) {}),
     Card(
         Cards.blizzard,
         Cards.blizzard.cardName,
@@ -1202,7 +1246,8 @@ class Deck {
                     activeDeck(deck), {CardType.army, CardType.leader, CardType.beast, CardType.flame}) *
                 5;
           }
-        }),
+        },
+        aufheben: (deck) {}),
     Card(
         Cards.rauch,
         Cards.rauch.cardName,
@@ -1231,7 +1276,8 @@ class Deck {
         ])),
         (deck) {
           return 0;
-        }),
+        },
+        aufheben: (deck) {}),
     Card(
         Cards.wirbelsturm,
         Cards.wirbelsturm.cardName,
@@ -1259,7 +1305,8 @@ class Deck {
         ])),
         (deck) {
           return 0;
-        }),
+        },
+        aufheben: (deck) {}),
     Card(
         Cards.luftwesen,
         Cards.luftwesen.cardName,
@@ -1278,7 +1325,8 @@ class Deck {
         ])),
         (deck) {
           return 0;
-        }),
+        },
+        aufheben: (deck) {}),
     Card(
         Cards.sammler,
         Cards.sammler.cardName,
@@ -1315,20 +1363,15 @@ class Deck {
                     '+10 für drei unterschiedliche Karten der gleichen Farbe, +40 für vier Karten der gleichen Farbe, +100 für fünf unterschiedliche Karten der gleichen Farbe')),
         (deck) {
           return 0;
-        }),
+        },
+        aufheben: (deck) {}),
     Card(
         Cards.herrDerBestien,
         Cards.herrDerBestien.cardName,
         CardType.wizard,
         false,
         9,
-        (deck) {
-          for (var card in deck.keys) {
-            if (card.cardType == CardType.beast) {
-              deck[card]?.activationState = true;
-            }
-          }
-        },
+        (deck) {},
         (deck) {
           return amountOf(activeDeck(deck), {CardType.beast}) * 9;
         },
@@ -1342,6 +1385,15 @@ class Deck {
         ])),
         (deck) {
           return 0;
+        },
+        aufheben: (deck) {
+          for (var card in deck.keys) {
+            if (card.cardType == CardType.beast) {
+              deck[card]?.activationState = true;
+              card.penalty = (deck) => 0;
+              card.block = (deck) {};
+            }
+          }
         }),
     Card(
         Cards.totenbeschwoerer,
@@ -1367,7 +1419,8 @@ class Deck {
         ])),
         (deck) {
           return 0;
-        }),
+        },
+        aufheben: (deck) {}),
     Card(
         Cards.hexenmeister,
         Cards.hexenmeister.cardName,
@@ -1389,7 +1442,8 @@ class Deck {
         (deck) {
           return amountOf(activeDeck(deck), {CardType.leader, CardType.wizard}, ids: {Cards.hexenmeister}) *
               10;
-        }),
+        },
+        aufheben: (deck) {}),
     Card(
         Cards.magierin,
         Cards.magierin.cardName,
@@ -1416,7 +1470,8 @@ class Deck {
         ])),
         (deck) {
           return 0;
-        }),
+        },
+        aufheben: (deck) {}),
     Card(
         Cards.hofnarr,
         Cards.hofnarr.cardName,
@@ -1440,7 +1495,8 @@ class Deck {
                     '+3 für jede andere Karte mit einer ungeraden Basisstärke. ODER +50 wenn alle Karten eine ungerade Basisstärke haben.')),
         (deck) {
           return 0;
-        }),
+        },
+        aufheben: (deck) {}),
   ];
 }
 
@@ -1546,6 +1602,7 @@ class Card implements Comparable<Card> {
   Cards id;
 
   void Function(Map<Card, CardState>) block;
+  void Function(Map<Card, CardState>) aufheben;
   int Function(Map<Card, CardState>) bonus;
   // Returns a penalty that is subtracted from the overall strength of the card
   int Function(Map<Card, CardState>) penalty;
@@ -1558,7 +1615,8 @@ class Card implements Comparable<Card> {
   int get hashCode => id.hashCode;
 
   Card(this.id, this.name, this.cardType, this.hasAction, this.baseStrength, this.block, this.bonus,
-      this.description, this.penalty);
+      this.description, this.penalty,
+      {required this.aufheben});
 
   void executeBlock(Map<Card, CardState> deck) {
     block(deck);

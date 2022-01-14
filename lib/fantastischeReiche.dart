@@ -355,6 +355,9 @@ class HandWidget extends State<FantastischeReiche> {
         entry.value.activationState = null;
       }
       for (var key in _hand.keys) {
+        key.aufheben(_hand);
+      }
+      for (var key in _hand.keys) {
         key.block(_hand);
       }
       _sum = _hand.entries
