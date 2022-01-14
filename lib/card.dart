@@ -725,17 +725,15 @@ class Deck {
         32,
         (deck) {
           for (var card in deck.keys) {
-            if (contains(activeDeck(deck), 'Waldläufer')) {
-              if ({CardType.land, CardType.flame}.contains(card.cardType)) {
-                if (card.name != 'Gebirge' || card.name != 'Blitz') {
+            if (card.name != Cards.gebirge.cardName && card.name != Cards.blitz.cardName) {
+              if (contains(activeDeck(deck), Cards.waldlaeufer.cardName)) {
+                if ({CardType.land, CardType.flame}.contains(card.cardType)) {
                   if (deck[card]?.activationState == null) {
                     deck[card]?.activationState = false;
                   }
                 }
-              }
-            } else {
-              if ({CardType.army, CardType.land, CardType.flame}.contains(card.cardType)) {
-                if (card.name != 'Gebirge' || card.name != 'Blitz') {
+              } else {
+                if ({CardType.army, CardType.land, CardType.flame}.contains(card.cardType)) {
                   if (deck[card]?.activationState == null) {
                     deck[card]?.activationState = false;
                   }
@@ -804,7 +802,7 @@ class Deck {
         (deck) {
           return 0;
         }),
-    Card(Cards.gestaltwandler, 'Gestaltwandler', CardType.wild, true, 0, (deck) {}, (deck) {
+    Card(Cards.gestaltwandler, Cards.gestaltwandler.cardName, CardType.wild, true, 0, (deck) {}, (deck) {
       return 0;
     },
         RichText(
