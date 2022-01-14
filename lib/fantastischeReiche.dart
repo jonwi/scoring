@@ -360,6 +360,9 @@ class HandWidget extends State<FantastischeReiche> {
       for (var key in _hand.keys) {
         key.block(_hand);
       }
+      for (var key in _hand.keys) {
+        key.block(_hand);
+      }
       _sum = _hand.entries
           .where((e) => e.value.activationState == null || e.value.activationState == true)
           .fold(0, (previousValue, element) => previousValue + element.key.calculateStrength(_hand));
