@@ -18,7 +18,7 @@ class Deck {
           if (contains(aDeck, 'Königin')) {
             return amountOf(aDeck, {CardType.army}) * 20;
           } else {
-            return amountOf(aDeck, {CardType.army}) * 8;
+            return amountOf(aDeck, {CardType.army}) * 5;
           }
         },
         RichText(
@@ -49,7 +49,7 @@ class Deck {
           if (contains(aDeck, 'König')) {
             return amountOf(aDeck, {CardType.army}) * 20;
           } else {
-            return amountOf(aDeck, {CardType.army}) * 8;
+            return amountOf(aDeck, {CardType.army}) * 5;
           }
         },
         RichText(
