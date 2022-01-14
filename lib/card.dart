@@ -379,11 +379,7 @@ class Deck {
         CardType.artifact,
         false,
         1,
-        (deck) {
-          for (var key in deck.keys) {
-            deck[key]?.activationState = true;
-          }
-        },
+        (deck) {},
         (deck) {
           return 0;
         },
@@ -393,7 +389,13 @@ class Deck {
         (deck) {
           return 0;
         },
-        aufheben: (deck) {}),
+        aufheben: (deck) {
+          for (var key in deck.keys) {
+            deck[key]?.activationState = true;
+            key.penalty = (deck) => 0;
+            key.block = (deck) {};
+          }
+        }),
     Card(
         Cards.einhorn,
         Cards.einhorn.cardName,
@@ -899,13 +901,7 @@ class Deck {
         CardType.land,
         false,
         9,
-        (deck) {
-          for (var card in deck.keys) {
-            if (card.cardType == CardType.flood) {
-              deck[card]?.activationState = true;
-            }
-          }
-        },
+        (deck) {},
         (deck) {
           var aDeck = activeDeck(deck);
           if (contains(aDeck, 'Rauch') && contains(aDeck, 'Buschfeuer')) {
@@ -926,20 +922,22 @@ class Deck {
         (deck) {
           return 0;
         },
-        aufheben: (deck) {}),
+        aufheben: (deck) {
+          for (var card in deck.keys) {
+            if (card.cardType == CardType.flood) {
+              deck[card]?.activationState = true;
+              card.penalty = (deck) => 0;
+              card.block = (deck) {};
+            }
+          }
+        }),
     Card(
         Cards.hoehle,
         Cards.hoehle.cardName,
         CardType.land,
         false,
         6,
-        (deck) {
-          for (var card in deck.keys) {
-            if (card.cardType == CardType.weather) {
-              deck[card]?.activationState = true;
-            }
-          }
-        },
+        (deck) {},
         (deck) {
           var aDeck = activeDeck(deck);
           if (contains(aDeck, 'Zwergeninfanterie') || contains(aDeck, 'Drache')) {
@@ -960,7 +958,15 @@ class Deck {
         (deck) {
           return 0;
         },
-        aufheben: (deck) {}),
+        aufheben: (deck) {
+          for (var card in deck.keys) {
+            if (card.cardType == CardType.weather) {
+              deck[card]?.activationState = true;
+              card.penalty = (deck) => 0;
+              card.block = (deck) {};
+            }
+          }
+        }),
     Card(
         Cards.glockenturm,
         Cards.glockenturm.cardName,
