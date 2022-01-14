@@ -406,7 +406,7 @@ class Deck {
         (deck) {
           var aDeck = activeDeck(deck);
           if (contains(aDeck, 'Prinzessin')) {
-            return 40;
+            return 30;
           }
           if (contains(aDeck, 'Königin') || contains(aDeck, 'Kaiserin') || contains(aDeck, 'Magierin')) {
             return 15;
