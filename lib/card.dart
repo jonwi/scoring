@@ -303,10 +303,12 @@ class Deck {
               return 60;
             case 6:
               return 100;
-            case 7:
-              return 150;
             default:
-              return 0;
+              if (max >= 7) {
+                return 150;
+              } else {
+                return 0;
+              }
           }
         },
         RichText(
