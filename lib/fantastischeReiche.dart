@@ -321,6 +321,7 @@ class HandWidget extends State<FantastischeReiche> {
           game.Card chosen = _hand.keys.where((element) => element.id == cardID).first;
           _hand[chosen]?.activationState = true;
           chosen.penalty = (deck) => 0;
+          chosen.block = (deck) {};
         }
         break;
       default:
