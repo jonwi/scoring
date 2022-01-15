@@ -138,6 +138,7 @@ class TakePictureScreenState extends State<CameraScan> {
   Future<void> _scan() async {
     try {
       await _initializeControllerFuture;
+      _controller.setFlashMode(FlashMode.off);
       final cameraImage = await _controller.takePicture();
       final inputImage = InputImage.fromFilePath(cameraImage.path);
 
