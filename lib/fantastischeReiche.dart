@@ -285,11 +285,12 @@ class HandWidget extends State<FantastischeReiche> {
           );
         }));
         if (cardID != null) {
-          game.Card chosen = _hand.keys.where((element) => element.id == cardID).elementAt(0);
+          game.Card chosen = game.Deck().cards.where((element) => element.id == cardID).elementAt(0);
           card.name = chosen.name;
           card.penalty = chosen.penalty;
           card.cardType = chosen.cardType;
           card.baseStrength = chosen.baseStrength;
+          card.block = chosen.block;
           _hand[card] = _hand[card]!;
         }
         break;
