@@ -2,7 +2,7 @@ import 'package:camera/camera.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_ml_kit/google_ml_kit.dart';
-import 'package:string_similarity/src/extensions/string_extensions.dart';
+import 'package:string_similarity/string_similarity.dart';
 
 import 'card.dart';
 
@@ -143,7 +143,9 @@ class TakePictureScreenState extends State<CameraScan> {
 
       final RecognisedText recognisedText = await _textDetector.processImage(inputImage);
       List<String> foundCards = [];
-      print(recognisedText.text);
+      if (kDebugMode) {
+        print(recognisedText.text);
+      }
       for (TextBlock block in recognisedText.blocks) {
         for (TextLine line in block.lines) {
           var list = Deck().cards.map((card) => card.id).where((id) {

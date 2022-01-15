@@ -148,16 +148,25 @@ class HandWidget extends State<FantastischeReiche> {
             ? Expanded(
                 flex: 1,
                 child: IconButton(
-                  icon: const Icon(
-                    Icons.circle,
-                    size: 35,
-                  ),
+                  padding: const EdgeInsets.all(0),
+                  iconSize: 20,
                   onPressed: card.hasAction
                       ? () {
                           _performAction(card);
                         }
                       : () {},
-                  color: card.hasAction ? Colors.green : Colors.white,
+                  color: Colors.white,
+                  icon: Center(
+                    child: Container(
+                      decoration: BoxDecoration(
+                        boxShadow: const [BoxShadow(color: Colors.green, spreadRadius: 10)],
+                        borderRadius: BorderRadius.circular(300),
+                      ),
+                      child: const Icon(
+                        Icons.edit,
+                      ),
+                    ),
+                  ),
                 ),
               )
             : const Spacer(
