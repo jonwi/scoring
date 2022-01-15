@@ -306,6 +306,7 @@ class HandWidget extends State<FantastischeReiche> {
           if (cardType != null) {
             game.Card chosen = _hand.keys.where((element) => element.id == cardID).first;
             chosen.cardType = cardType;
+            card.hasAction = false;
           }
         }
         break;
@@ -322,6 +323,7 @@ class HandWidget extends State<FantastischeReiche> {
           _hand[chosen]?.activationState = true;
           chosen.penalty = (deck) => 0;
           chosen.block = (deck) {};
+          card.hasAction = false;
         }
         break;
       default:
