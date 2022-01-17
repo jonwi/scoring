@@ -109,20 +109,20 @@ class TakePictureScreenState extends State<CameraScan> {
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       floatingActionButton: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
         const Spacer(
-          flex: 2,
+          flex: 3,
         ),
         Expanded(
-          flex: 1,
+          flex: 3,
           child: FloatingActionButton(
             heroTag: 'btn2',
             onPressed: () async {
               await _scan();
             },
-            child: const Icon(Icons.camera_alt),
+            child: const Icon(Icons.camera),
           ),
         ),
         Expanded(
-          flex: 1,
+          flex: 3,
           child: FloatingActionButton(
               heroTag: 'btn1',
               backgroundColor: _cards.isNotEmpty ? Colors.green : Colors.grey,

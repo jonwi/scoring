@@ -42,26 +42,52 @@ class HandWidget extends State<FantastischeReiche> {
     return Scaffold(
       appBar: _buildAppBar(),
       drawer: Drawer(
-        child: ListView(
-            children: Hive.box('hands')
-                .toMap()
-                .entries
-                .map((e) => ListTile(
-                      title: _getName(e.value.entries.first),
-                      onTap: () {
-                        _loadHand(e.key);
-                        Navigator.pop(context);
-                      },
-                      trailing: IconButton(
-                        onPressed: () {
-                          setState(() {
-                            Hive.box('hands').delete(e.key);
-                          });
-                        },
-                        icon: const Icon(Icons.delete),
-                      ),
-                    ))
-                .toList()),
+        child: Column(children: [
+          const Expanded(
+            flex: 1,
+            child: DrawerHeader(
+              margin: EdgeInsets.all(0),
+              child: Text(
+                'Vergangene Hände',
+                style: TextStyle(fontSize: 25),
+              ),
+            ),
+          ),
+          Expanded(
+            flex: 7,
+            child: ListView(
+                children: Hive.box('hands')
+                    .toMap()
+                    .entries
+                    .map((e) => ListTile(
+                          contentPadding: const EdgeInsets.all(0),
+                          title: Row(children: [
+                            Expanded(flex: 5, child: _getName(e.value.entries.first)),
+                            Expanded(
+                              child: IconButton(
+                                iconSize: 30,
+                                onPressed: () {
+                                  setState(() {
+                                    Hive.box('hands').delete(e.key);
+                                  });
+                                },
+                                icon: const Icon(
+                                  Icons.delete,
+                                  color: Colors.red,
+                                ),
+                              ),
+                            ),
+                          ]),
+                          onTap: () {
+                            _loadHand(e.key);
+                            Navigator.pop(context);
+                          },
+                        ))
+                    .toList()
+                    .reversed
+                    .toList()),
+          ),
+        ]),
       ),
       body: SingleChildScrollView(
         child: Center(
@@ -90,7 +116,7 @@ class HandWidget extends State<FantastischeReiche> {
             onPressed: () {
               _deleteAll();
             },
-            child: const Text('Alle entfernen')),
+            child: const Text('Neue Hand')),
       ]),
       floatingActionButton: Column(mainAxisAlignment: MainAxisAlignment.end, children: [
         _buildScanButton(context),
@@ -267,7 +293,10 @@ class HandWidget extends State<FantastischeReiche> {
               Icons.remove_circle_outline_sharp,
               color: Colors.red,
             ),
-            onPressed: () => _removeCard(card),
+            onPressed: () {
+              _removeCard(card);
+              _saveHand();
+            },
           ),
         ),
       ],
@@ -403,6 +432,7 @@ class HandWidget extends State<FantastischeReiche> {
         return;
     }
     _calculateHand();
+    _saveHand();
   }
 
   /// adds the card to the current hand if not yet in there
@@ -422,7 +452,6 @@ class HandWidget extends State<FantastischeReiche> {
     } else {
       _calculateHand();
     }
-    _saveHand();
   }
 
   /// calculates the strength of _hand unblocks everything, blocks, and then sums every card
@@ -473,44 +502,52 @@ class HandWidget extends State<FantastischeReiche> {
       }
       return map;
     });
-    List<Widget> children = [
-      Container(
-        margin: const EdgeInsets.all(10),
-        child: SizedBox(
-          width: 50,
-          child: Center(
-            child: Text(
-              '${entry.key}',
-              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 20, color: Colors.black),
-            ),
-          ),
-        ),
-      )
-    ];
-    children.addAll(map.entries.map((entry) => Container(
-          margin: const EdgeInsets.all(10),
-          decoration: BoxDecoration(
-            boxShadow: [BoxShadow(color: entry.key.color, spreadRadius: 10)],
-            borderRadius: BorderRadius.circular(16),
-            color: entry.key.color,
-          ),
-          child: SizedBox(
-            width: 15,
-            child: Center(
-              child: Text(
-                '${entry.value}',
-                style: TextStyle(color: entry.key.textColor),
+    List<Widget> typeWidgets = map.entries
+        .map((entry) => Expanded(
+              child: Container(
+                margin: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  boxShadow: [BoxShadow(color: entry.key.color, spreadRadius: 10)],
+                  borderRadius: BorderRadius.circular(16),
+                  color: entry.key.color,
+                ),
+                child: Center(
+                  child: Text(
+                    '${entry.value}',
+                    style: TextStyle(color: entry.key.textColor),
+                  ),
+                ),
               ),
-            ),
-          ),
-        )));
+            ))
+        .toList();
     return Container(
+        padding: EdgeInsets.only(left: 5, right: 5),
         decoration: BoxDecoration(
           boxShadow: const [BoxShadow(color: Colors.brown, spreadRadius: 0)],
           borderRadius: BorderRadius.circular(16),
           color: Colors.brown,
         ),
-        child: Row(children: children));
+        child: Row(children: [
+          Expanded(
+            flex: 4,
+            child: Container(
+              margin: const EdgeInsets.all(10),
+              child: Center(
+                child: Text(
+                  '${entry.key}',
+                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 20, color: Colors.white),
+                ),
+              ),
+            ),
+          ),
+          Expanded(
+            flex: 13,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: typeWidgets,
+            ),
+          ),
+        ]));
   }
 }
 
