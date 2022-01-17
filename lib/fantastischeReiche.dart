@@ -1,13 +1,18 @@
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
 import 'package:scoring/cameraScan.dart';
 import 'package:scoring/typeSelector.dart';
+import 'package:uuid/uuid.dart';
 
 import 'card.dart' as game;
+import 'card.dart';
 import 'cardSelector.dart';
 
 class FantastischeReiche extends StatefulWidget {
-  const FantastischeReiche({Key? key}) : super(key: key);
+  const FantastischeReiche({Key? key, required this.handID, required this.hand}) : super(key: key);
+  final String handID;
+  final Map<game.Card, CardState> hand;
 
   @override
   State<StatefulWidget> createState() {
@@ -16,14 +21,48 @@ class FantastischeReiche extends StatefulWidget {
 }
 
 class HandWidget extends State<FantastischeReiche> {
-  /// Card and Active State where true means the card counts towards total and false means its deactivated and visibility
-  final Map<game.Card, CardState> _hand = {};
+  @override
+  void initState() {
+    _handID = widget.handID;
+    _hand = widget.hand;
+    super.initState();
+  }
+
+  /// current Strength of the hand
   int _sum = 0;
+
+  /// id to save and restore the current hand
+  late String _handID;
+
+  /// Card and Active State where true means the card counts towards total and false means its deactivated and visibility
+  late Map<game.Card, CardState> _hand;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: _buildAppBar(),
+      drawer: Drawer(
+        child: ListView(
+            children: Hive.box('hands')
+                .toMap()
+                .entries
+                .map((e) => ListTile(
+                      title: _getName(e.value.entries.first),
+                      onTap: () {
+                        _loadHand(e.key);
+                        Navigator.pop(context);
+                      },
+                      trailing: IconButton(
+                        onPressed: () {
+                          setState(() {
+                            Hive.box('hands').delete(e.key);
+                          });
+                        },
+                        icon: const Icon(Icons.delete),
+                      ),
+                    ))
+                .toList()),
+      ),
       body: SingleChildScrollView(
         child: Center(
           child: ExpansionPanelList(
@@ -49,9 +88,7 @@ class HandWidget extends State<FantastischeReiche> {
         ElevatedButton(onPressed: () => _resetActions(), child: const Text('Aktionen rückgängig')),
         ElevatedButton(
             onPressed: () {
-              while (_hand.isNotEmpty) {
-                _removeCard(_hand.keys.first);
-              }
+              _deleteAll();
             },
             child: const Text('Alle entfernen')),
       ]),
@@ -60,6 +97,13 @@ class HandWidget extends State<FantastischeReiche> {
         _buildAddButton(context),
       ]),
     );
+  }
+
+  void _deleteAll() {
+    while (_hand.isNotEmpty) {
+      _removeCard(_hand.keys.first);
+    }
+    _handID = const Uuid().v1();
   }
 
   /// floating button to go to scanner
@@ -74,10 +118,28 @@ class HandWidget extends State<FantastischeReiche> {
           var result = await Navigator.push<Set<game.Cards>>(context, MaterialPageRoute(builder: (context) {
             return CameraScan(camera: firstCamera);
           }));
-          result?.forEach((element) {
-            _addCard(element);
-          });
+          if (result != null) {
+            for (var element in result) {
+              _addCard(element);
+            }
+            _saveHand();
+          }
         });
+  }
+
+  /// saves the current hand
+  void _saveHand() {
+    Hive.box('hands').put(_handID, {_sum: _hand.keys.map((card) => card.id).toList()});
+  }
+
+  /// loads the given hand
+  void _loadHand(String handID) {
+    Map<int, List<Cards>> map = Hive.box('hands').get(handID);
+    List<Cards> list = map.entries.first.value;
+    _hand = {};
+    for (Cards id in list) {
+      _addCard(id);
+    }
   }
 
   /// Floating add button to go to card selector
@@ -97,6 +159,7 @@ class HandWidget extends State<FantastischeReiche> {
         if (result != null && _hand.length <= 8) {
           _addCard(result);
         }
+        _saveHand();
       },
     );
   }
@@ -359,6 +422,7 @@ class HandWidget extends State<FantastischeReiche> {
     } else {
       _calculateHand();
     }
+    _saveHand();
   }
 
   /// calculates the strength of _hand unblocks everything, blocks, and then sums every card
@@ -395,6 +459,58 @@ class HandWidget extends State<FantastischeReiche> {
       _hand[card] = _hand.remove(entry.key)!;
     }
     _calculateHand();
+  }
+
+  /// gets the name of a saved Hand
+  Widget _getName(MapEntry<int, List<Cards>> entry) {
+    Map<CardType, int> map = entry.value
+        .map((id) => Deck().cards.firstWhere((card) => card.id == id).cardType)
+        .fold<Map<CardType, int>>({}, (map, type) {
+      if (map[type] != null) {
+        map[type] = map[type]! + 1;
+      } else {
+        map[type] = 1;
+      }
+      return map;
+    });
+    List<Widget> children = [
+      Container(
+        margin: const EdgeInsets.all(10),
+        child: SizedBox(
+          width: 50,
+          child: Center(
+            child: Text(
+              '${entry.key}',
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 20, color: Colors.black),
+            ),
+          ),
+        ),
+      )
+    ];
+    children.addAll(map.entries.map((entry) => Container(
+          margin: const EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            boxShadow: [BoxShadow(color: entry.key.color, spreadRadius: 10)],
+            borderRadius: BorderRadius.circular(16),
+            color: entry.key.color,
+          ),
+          child: SizedBox(
+            width: 15,
+            child: Center(
+              child: Text(
+                '${entry.value}',
+                style: TextStyle(color: entry.key.textColor),
+              ),
+            ),
+          ),
+        )));
+    return Container(
+        decoration: BoxDecoration(
+          boxShadow: const [BoxShadow(color: Colors.brown, spreadRadius: 0)],
+          borderRadius: BorderRadius.circular(16),
+          color: Colors.brown,
+        ),
+        child: Row(children: children));
   }
 }
 

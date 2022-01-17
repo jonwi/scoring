@@ -1,8 +1,11 @@
 import 'dart:collection';
 
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
 
 import 'fantastischeReiche.dart';
+
+part 'card.g.dart';
 
 class Deck {
   List<Card> cards = [
@@ -1640,60 +1643,115 @@ class Card implements Comparable<Card> {
   }
 }
 
+@HiveType(typeId: 1)
 enum Cards {
+  @HiveField(0)
   koenig,
+  @HiveField(1)
   koenigin,
+  @HiveField(2)
   prinzessin,
+  @HiveField(3)
   kriegsherr,
+  @HiveField(4)
   kaiserin,
+  @HiveField(5)
   ritter,
+  @HiveField(6)
   elbenschuetzen,
+  @HiveField(7)
   leichteKavallerie,
+  @HiveField(8)
   zwergeninfanterie,
+  @HiveField(9)
   waldlaeufer,
+  @HiveField(10)
   schildVonKeth,
+  @HiveField(11)
   juwelDerOrdnung,
+  @HiveField(12)
   weltenbaum,
+  @HiveField(13)
   buchDerVeraenderung,
+  @HiveField(14)
   runeDesSchutzes,
+  @HiveField(15)
   einhorn,
+  @HiveField(16)
   basilisk,
+  @HiveField(17)
   schlachtross,
+  @HiveField(18)
   drache,
+  @HiveField(19)
   hydra,
+  @HiveField(20)
   buschfeuer,
+  @HiveField(21)
   kerze,
+  @HiveField(22)
   schmiede,
+  @HiveField(23)
   blitz,
+  @HiveField(24)
   feuerwesen,
+  @HiveField(25)
   quelleDesLebens,
+  @HiveField(26)
   sumpf,
+  @HiveField(27)
   grosseFlut,
+  @HiveField(28)
   insel,
+  @HiveField(29)
   wasserwesen,
+  @HiveField(30)
   gestaltwandler,
+  @HiveField(31)
   spiegelung,
+  @HiveField(32)
   doppelgaenger,
+  @HiveField(33)
   gebirge,
+  @HiveField(34)
   hoehle,
+  @HiveField(35)
   glockenturm,
+  @HiveField(36)
   wald,
+  @HiveField(37)
   erdwesen,
+  @HiveField(38)
   kriegsschiff,
+  @HiveField(39)
   zauberstab,
+  @HiveField(40)
   schwertVonKeth,
+  @HiveField(41)
   elbischerBogen,
+  @HiveField(42)
   kampfzeppelin,
+  @HiveField(43)
   regensturm,
+  @HiveField(44)
   blizzard,
+  @HiveField(45)
   rauch,
+  @HiveField(46)
   wirbelsturm,
+  @HiveField(47)
   luftwesen,
+  @HiveField(48)
   sammler,
+  @HiveField(49)
   herrDerBestien,
+  @HiveField(50)
   totenbeschwoerer,
+  @HiveField(51)
   hexenmeister,
+  @HiveField(52)
   magierin,
+  @HiveField(53)
   hofnarr,
 }
 

@@ -35,6 +35,9 @@ dependencies:
   google_ml_kit:
   image_picker:
   string_similarity:
+  hive:
+  hive_flutter:
+  uuid: 3.0.5
 
 
   # The following adds the Cupertino Icons font to your application.
@@ -44,6 +47,8 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  hive_generator:
+  build_runner:
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is

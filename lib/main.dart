@@ -1,7 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:scoring/fantastischeReiche.dart';
+import 'package:uuid/uuid.dart';
+
+import 'card.dart';
 
 Future<void> main() async {
+  await Hive.initFlutter();
+  Hive.registerAdapter(CardsAdapter());
+  await Hive.openBox('hands');
+
   runApp(const MyApp());
 }
 
@@ -16,30 +24,10 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.brown,
       ),
-      home: const FantastischeReiche(),
+      home: FantastischeReiche(
+        handID: const Uuid().v1(),
+        hand: {},
+      ),
     );
-  }
-}
-
-class MyHomePage extends StatelessWidget {
-  const MyHomePage({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-        body: ListView(
-      children: [
-        ListTile(
-          title: const Text('Fantastische Reiche'),
-          onTap: () {
-            Navigator.of(context).push(
-              MaterialPageRoute<void>(builder: (BuildContext) {
-                return FantastischeReiche();
-              }),
-            );
-          },
-        )
-      ],
-    ));
   }
 }
