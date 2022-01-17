@@ -521,7 +521,7 @@ class HandWidget extends State<FantastischeReiche> {
             ))
         .toList();
     return Container(
-        padding: EdgeInsets.only(left: 5, right: 5),
+        padding: const EdgeInsets.only(left: 5, right: 5),
         decoration: BoxDecoration(
           boxShadow: const [BoxShadow(color: Colors.brown, spreadRadius: 0)],
           borderRadius: BorderRadius.circular(16),
