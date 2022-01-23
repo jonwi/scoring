@@ -9,7 +9,6 @@ Future<void> main() async {
   await Hive.initFlutter();
   Hive.registerAdapter(CardsAdapter());
   await Hive.openBox('hands');
-
   runApp(const MyApp());
 }
 
