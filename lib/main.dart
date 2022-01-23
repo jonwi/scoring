@@ -8,7 +8,7 @@ import 'card.dart';
 Future<void> main() async {
   await Hive.initFlutter();
   Hive.registerAdapter(CardsAdapter());
-  await Hive.openBox('hands');
+  await Hive.openBox<Map<int, List<Cards>>>('hands');
   runApp(const MyApp());
 }
 

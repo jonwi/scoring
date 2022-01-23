@@ -41,54 +41,7 @@ class HandWidget extends State<FantastischeReiche> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: _buildAppBar(),
-      drawer: Drawer(
-        child: Column(children: [
-          const Expanded(
-            flex: 1,
-            child: DrawerHeader(
-              margin: EdgeInsets.all(0),
-              child: Text(
-                'Vergangene Hände',
-                style: TextStyle(fontSize: 25),
-              ),
-            ),
-          ),
-          Expanded(
-            flex: 7,
-            child: ListView(
-                children: Hive.box('hands')
-                    .toMap()
-                    .entries
-                    .map((e) => ListTile(
-                          contentPadding: const EdgeInsets.all(0),
-                          title: Row(children: [
-                            Expanded(flex: 5, child: _getName(e.value.entries.first)),
-                            Expanded(
-                              child: IconButton(
-                                iconSize: 30,
-                                onPressed: () {
-                                  setState(() {
-                                    Hive.box('hands').delete(e.key);
-                                  });
-                                },
-                                icon: const Icon(
-                                  Icons.delete,
-                                  color: Colors.red,
-                                ),
-                              ),
-                            ),
-                          ]),
-                          onTap: () {
-                            _loadHand(e.key);
-                            Navigator.pop(context);
-                          },
-                        ))
-                    .toList()
-                    .reversed
-                    .toList()),
-          ),
-        ]),
-      ),
+      drawer: _buildDrawer(context),
       body: SingleChildScrollView(
         child: Center(
           child: ExpansionPanelList(
@@ -125,6 +78,60 @@ class HandWidget extends State<FantastischeReiche> {
     );
   }
 
+  /// builds a drawer that shows all hands
+  Drawer _buildDrawer(BuildContext context) {
+    return Drawer(
+      child: Column(children: [
+        const Expanded(
+          flex: 1,
+          child: DrawerHeader(
+            margin: EdgeInsets.all(0),
+            child: Text(
+              'Vergangene Hände',
+              style: TextStyle(fontSize: 25),
+            ),
+          ),
+        ),
+        Expanded(
+          flex: 7,
+          child: ListView(
+              children: _getHandsBox()
+                  .toMap()
+                  .entries
+                  .map((e) => ListTile(
+                        contentPadding: const EdgeInsets.all(0),
+                        title: Row(children: [
+                          Expanded(flex: 5, child: _getName(e.value.entries.first)),
+                          Expanded(
+                            child: IconButton(
+                              iconSize: 30,
+                              onPressed: () {
+                                setState(() {
+                                  _getHandsBox().delete(e.key);
+                                });
+                              },
+                              icon: const Icon(
+                                Icons.delete,
+                                color: Colors.red,
+                              ),
+                            ),
+                          ),
+                        ]),
+                        onTap: () {
+                          _loadHand(e.key);
+                          Navigator.pop(context);
+                        },
+                      ))
+                  .toList()
+                  .reversed
+                  .toList()),
+        ),
+      ]),
+    );
+  }
+
+  Box<Map<int, List<game.Cards>>> _getHandsBox() => Hive.box<Map<int, List<game.Cards>>>('hands');
+
   void _deleteAll() {
     while (_hand.isNotEmpty) {
       _removeCard(_hand.keys.first);
@@ -155,16 +162,19 @@ class HandWidget extends State<FantastischeReiche> {
 
   /// saves the current hand
   void _saveHand() {
-    Hive.box('hands').put(_handID, {_sum: _hand.keys.map((card) => card.id).toList()});
+    _getHandsBox().put(_handID, {_sum: _hand.keys.map((card) => card.id).toList()});
   }
 
   /// loads the given hand
   void _loadHand(String handID) {
-    Map<int, List<Cards>> map = Hive.box('hands').get(handID);
-    List<Cards> list = map.entries.first.value;
-    _hand = {};
-    for (Cards id in list) {
-      _addCard(id);
+    Map<int, List<Cards>>? map = _getHandsBox().get(handID);
+    if (map != null) {
+      List<Cards> list = map.entries.first.value;
+      _hand = {};
+      for (Cards id in list) {
+        _addCard(id);
+      }
+      _handID = handID;
     }
   }
 
@@ -529,18 +539,20 @@ class HandWidget extends State<FantastischeReiche> {
         ),
         child: Row(children: [
           Expanded(
-            flex: 4,
+            flex: 5,
             child: Container(
               margin: const EdgeInsets.all(10),
               child: Center(
                 child: Text(
                   '${entry.key}',
                   style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 20, color: Colors.white),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
             ),
           ),
-          Expanded(
+          Flexible(
             flex: 13,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
