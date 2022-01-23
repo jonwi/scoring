@@ -1346,8 +1346,10 @@ class Deck {
         7,
         (deck) {},
         (deck) {
-          int max = activeDeck(deck)
-              .toSet()
+          HashSet<Card> set = HashSet(
+              equals: (card1, card2) => card1.compareTo(card2) == 0, hashCode: (card) => card.name.hashCode);
+          set.addAll(activeDeck(deck));
+          int max = set
               .map((card) => card.cardType)
               .fold<Map<CardType, int>>(HashMap<CardType, int>(), (map, type) {
                 map.putIfAbsent(type, () => 0);
@@ -1640,6 +1642,11 @@ class Card implements Comparable<Card> {
   @override
   int compareTo(Card other) {
     return name.compareTo(other.name);
+  }
+
+  @override
+  String toString() {
+    return name;
   }
 }
 
