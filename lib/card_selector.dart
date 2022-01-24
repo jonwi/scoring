@@ -36,7 +36,12 @@ class CardSelectorState extends State<CardSelector> {
               opacity: _expanded[card]! ? 1 : 0,
               duration: const Duration(milliseconds: 700),
               child: Visibility(
-                  visible: _expanded[card]!, child: Wrap(children: [Center(child: card.description)]))),
+                  visible: _expanded[card]!,
+                  child: Row(children: [
+                    const Spacer(),
+                    Expanded(flex: 5, child: Wrap(children: [Center(child: card.description)])),
+                    const Spacer(),
+                  ]))),
           title: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [

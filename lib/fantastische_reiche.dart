@@ -3,15 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:scoring/camera_scan.dart';
 import 'package:scoring/type_selector.dart';
-import 'package:uuid/uuid.dart';
 
 import 'card.dart' as game;
 import 'card.dart';
 import 'card_selector.dart';
 
 class FantastischeReiche extends StatefulWidget {
-  const FantastischeReiche({Key? key, required this.handID, required this.hand}) : super(key: key);
-  final String handID;
+  const FantastischeReiche({Key? key, this.handID, required this.hand}) : super(key: key);
+  final int? handID;
   final Map<game.Card, CardState> hand;
 
   @override
@@ -24,7 +23,7 @@ class HandWidget extends State<FantastischeReiche> {
   @override
   void initState() {
     _handID = widget.handID;
-    _hand = widget.hand;
+    _hand = {...widget.hand};
     super.initState();
   }
 
@@ -32,7 +31,7 @@ class HandWidget extends State<FantastischeReiche> {
   int _sum = 0;
 
   /// id to save and restore the current hand
-  late String _handID;
+  late int? _handID;
 
   /// Card and Active State where true means the card counts towards total and false means its deactivated and visibility
   late Map<game.Card, CardState> _hand;
@@ -45,6 +44,7 @@ class HandWidget extends State<FantastischeReiche> {
       body: SingleChildScrollView(
         child: Center(
           child: ExpansionPanelList(
+            key: Key('${_hand.length}'),
             children: _hand.entries
                 .map<ExpansionPanel>((entry) => ExpansionPanel(
                       headerBuilder: (BuildContext context, bool isExpanded) {
@@ -101,7 +101,7 @@ class HandWidget extends State<FantastischeReiche> {
                   .map((e) => ListTile(
                         contentPadding: const EdgeInsets.all(0),
                         title: Row(children: [
-                          Expanded(flex: 5, child: _getName(e.value.entries.first)),
+                          Expanded(flex: 5, child: _getName(e.value.entries.first, e.key)),
                           Expanded(
                             child: IconButton(
                               iconSize: 30,
@@ -136,7 +136,7 @@ class HandWidget extends State<FantastischeReiche> {
     while (_hand.isNotEmpty) {
       _removeCard(_hand.keys.first);
     }
-    _handID = const Uuid().v1();
+    _handID = null;
   }
 
   /// floating button to go to scanner
@@ -162,11 +162,15 @@ class HandWidget extends State<FantastischeReiche> {
 
   /// saves the current hand
   void _saveHand() {
-    _getHandsBox().put(_handID, {_sum: _hand.keys.map((card) => card.id).toList()});
+    if (_handID == null) {
+      _getHandsBox().add({_sum: _hand.keys.map((card) => card.id).toList()}).then((value) => _handID = value);
+    } else {
+      _getHandsBox().put(_handID, {_sum: _hand.keys.map((card) => card.id).toList()});
+    }
   }
 
   /// loads the given hand
-  void _loadHand(String handID) {
+  void _loadHand(int handID) {
     Map<int, List<Cards>>? map = _getHandsBox().get(handID);
     if (map != null) {
       List<Cards> list = map.entries.first.value;
@@ -206,7 +210,12 @@ class HandWidget extends State<FantastischeReiche> {
         opacity: entry.value.visibility ? 1.0 : 0,
         duration: const Duration(milliseconds: 500),
         child: Visibility(
-            visible: entry.value.visibility, child: Wrap(children: [Center(child: entry.key.description)])));
+            visible: entry.value.visibility,
+            child: Row(children: [
+              const Spacer(),
+              Expanded(flex: 5, child: Wrap(children: [Center(child: entry.key.description)])),
+              const Spacer(),
+            ])));
   }
 
   /// Stats containing base strength, name, actionButton, bonus and penalty, and overall total
@@ -501,7 +510,7 @@ class HandWidget extends State<FantastischeReiche> {
   }
 
   /// gets the name of a saved Hand
-  Widget _getName(MapEntry<int, List<Cards>> entry) {
+  Widget _getName(MapEntry<int, List<Cards>> entry, int id) {
     Map<CardType, int> map = entry.value
         .map((id) => Deck().cards.firstWhere((card) => card.id == id).cardType)
         .fold<Map<CardType, int>>({}, (map, type) {
@@ -533,7 +542,10 @@ class HandWidget extends State<FantastischeReiche> {
     return Container(
         padding: const EdgeInsets.only(left: 5, right: 5),
         decoration: BoxDecoration(
-          boxShadow: const [BoxShadow(color: Colors.brown, spreadRadius: 0)],
+          boxShadow: [
+            const BoxShadow(color: Colors.brown, spreadRadius: 0),
+            _handID == id ? const BoxShadow(color: Colors.green, spreadRadius: 2) : const BoxShadow()
+          ],
           borderRadius: BorderRadius.circular(16),
           color: Colors.brown,
         ),

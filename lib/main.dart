@@ -2,7 +2,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:scoring/fantastische_reiche.dart';
-import 'package:uuid/uuid.dart';
 
 import 'card.dart';
 
@@ -27,8 +26,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.brown,
       ),
-      home: FantastischeReiche(
-        handID: const Uuid().v1(),
+      home: const FantastischeReiche(
         hand: {},
       ),
     );
