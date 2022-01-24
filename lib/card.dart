@@ -3,7 +3,7 @@ import 'dart:collection';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 
-import 'fantastischeReiche.dart';
+import 'fantastische_reiche.dart';
 
 part 'card.g.dart';
 

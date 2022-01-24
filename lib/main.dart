@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:scoring/fantastischeReiche.dart';
+import 'package:scoring/fantastische_reiche.dart';
 import 'package:uuid/uuid.dart';
 
 import 'card.dart';

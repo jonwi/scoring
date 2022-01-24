@@ -1,13 +1,13 @@
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
-import 'package:scoring/cameraScan.dart';
-import 'package:scoring/typeSelector.dart';
+import 'package:scoring/camera_scan.dart';
+import 'package:scoring/type_selector.dart';
 import 'package:uuid/uuid.dart';
 
 import 'card.dart' as game;
 import 'card.dart';
-import 'cardSelector.dart';
+import 'card_selector.dart';
 
 class FantastischeReiche extends StatefulWidget {
   const FantastischeReiche({Key? key, required this.handID, required this.hand}) : super(key: key);
