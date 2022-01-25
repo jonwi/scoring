@@ -2,7 +2,7 @@
     package="de.jonaswiener.scoring">
    <application
         android:label="scoring"
-        android:name="${applicationName}"
+        android:name="FR Scoring"
         android:icon="@mipmap/ic_fantrip">
         <activity
             android:name=".MainActivity"
