@@ -1,8 +1,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="de.jonaswiener.scoring">
    <application
-        android:label="scoring"
-        android:name="FR Scoring"
+        android:label="FR Scoring"
+        android:name="${applicationName}"
         android:icon="@mipmap/ic_fantrip">
         <activity
             android:name=".MainActivity"
