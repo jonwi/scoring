@@ -1,6 +1,7 @@
 import 'package:camera/camera.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_ml_kit/google_ml_kit.dart';
 import 'package:string_similarity/string_similarity.dart';
 
@@ -28,12 +29,17 @@ class TakePictureScreenState extends State<CameraScan> {
     super.initState();
     _controller = CameraController(widget.camera, ResolutionPreset.max, enableAudio: false);
     _initializeControllerFuture = _controller.initialize();
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
   }
 
   @override
   void dispose() {
     _controller.dispose();
     _textDetector.close();
+    SystemChrome.setPreferredOrientations([]);
     super.dispose();
   }
 
