@@ -45,7 +45,7 @@ class CardSelectorState extends State<CardSelector> {
           title: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Flexible(
+              Expanded(
                 child: Container(
                   margin: const EdgeInsets.all(15),
                   decoration: BoxDecoration(
@@ -53,13 +53,14 @@ class CardSelectorState extends State<CardSelector> {
                     borderRadius: BorderRadius.circular(16),
                     color: card.cardType.color,
                   ),
-                  child: SizedBox(
-                    width: 20,
-                    child: Center(
-                      child: Text('${card.baseStrength}',
-                          style: TextStyle(
-                            color: card.cardType == game.CardType.army ? Colors.white : Colors.black,
-                          )),
+                  child: Center(
+                    child: Text(
+                      '${card.baseStrength}',
+                      style: TextStyle(
+                        color: card.cardType == game.CardType.army ? Colors.white : Colors.black,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ),
                 ),
