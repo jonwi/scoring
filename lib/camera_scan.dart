@@ -26,10 +26,7 @@ class TakePictureScreenState extends State<CameraScan> {
   @override
   void initState() {
     super.initState();
-    _controller = CameraController(
-      widget.camera,
-      ResolutionPreset.max,
-    );
+    _controller = CameraController(widget.camera, ResolutionPreset.max, enableAudio: false);
     _initializeControllerFuture = _controller.initialize();
   }
 
