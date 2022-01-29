@@ -1564,7 +1564,7 @@ extension CardTypeExtension on CardType {
       case CardType.leader:
         return 'Anführer';
       case CardType.beast:
-        return 'Beast';
+        return 'Bestie';
       default:
         return 'Unbekannter Kartentyp';
     }
