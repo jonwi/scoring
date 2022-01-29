@@ -93,9 +93,9 @@ class TakePictureScreenState extends State<CameraScan> {
                     fit: BoxFit.fill,
                     child: IconButton(
                       padding: EdgeInsets.zero,
-                      iconSize: 70,
+                      iconSize: 30,
                       icon: const Icon(
-                        Icons.remove_circle_outline_sharp,
+                        Icons.delete,
                         color: Colors.red,
                       ),
                       onPressed: () {
