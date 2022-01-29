@@ -48,7 +48,25 @@ class HandWidget extends State<FantastischeReiche> {
             children: _hand.entries
                 .map<ExpansionPanel>((entry) => ExpansionPanel(
                       headerBuilder: (BuildContext context, bool isExpanded) {
-                        return _buildStats(entry);
+                        return Dismissible(
+                            key: Key(entry.key.id.name),
+                            child: _buildStats(entry),
+                            onDismissed: (direction) {
+                              _removeCard(entry.key);
+                              _saveHand();
+                            },
+                            background: Container(
+                                alignment: AlignmentDirectional.centerEnd,
+                                color: Colors.red,
+                                child:
+                                    Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: const [
+                                  Padding(
+                                      padding: EdgeInsets.only(left: 10),
+                                      child: Icon(Icons.delete, color: Colors.white)),
+                                  Padding(
+                                      padding: EdgeInsets.only(right: 10),
+                                      child: Icon(Icons.delete, color: Colors.white))
+                                ])));
                       },
                       body: _buildDescription(entry),
                       isExpanded: entry.value.visibility,
@@ -309,7 +327,7 @@ class HandWidget extends State<FantastischeReiche> {
         FittedBox(
           child: IconButton(
             icon: const Icon(
-              Icons.remove_circle_outline_sharp,
+              Icons.delete,
               color: Colors.red,
             ),
             onPressed: () {
