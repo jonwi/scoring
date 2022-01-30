@@ -425,10 +425,10 @@ class HandWidget extends State<FantastischeReiche> {
         if (cardID != null) {
           game.Card chosen = game.Deck().cards.where((element) => element.id == cardID).elementAt(0);
           card.name = chosen.name;
-          card.penalty = chosen.penalty;
+          card.hpenalty = chosen.hpenalty;
           card.cardType = chosen.cardType;
           card.baseStrength = chosen.baseStrength;
-          card.block = chosen.block;
+          card.hblock = chosen.hblock;
           _hand[card] = _hand[card]!;
         }
         break;
@@ -460,8 +460,8 @@ class HandWidget extends State<FantastischeReiche> {
         if (cardID != null) {
           game.Card chosen = _hand.keys.where((element) => element.id == cardID).first;
           _hand[chosen]?.activationState = true;
-          chosen.penalty = (deck) => 0;
-          chosen.block = (deck) {};
+          chosen.hpenalty = (deck, tis) => 0;
+          chosen.hblock = (deck, tis) {};
           card.hasAction = false;
         }
         break;
