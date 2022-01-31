@@ -550,8 +550,7 @@ class Deck {
                 card.name == 'Große Flut' ||
                 card.name == 'Insel' ||
                 card.name == 'Einhorn' ||
-                card.name == 'Drache' ||
-                card.name == 'Buschfeuer') {
+                card.name == 'Drache') {
               // Eigentlich muss die Bedingung negiert werden, so ist es aber einfacher
             } else {
               if (deck[card]?.activationState == null) {
