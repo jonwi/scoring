@@ -1160,14 +1160,10 @@ class Deck {
         false,
         35,
         (deck, tis) {
-          if (deck.keys.where((element) => element.cardType == CardType.army).isEmpty ||
-              deck.keys.where((card) => card.cardType == CardType.weather).isNotEmpty) {
-            for (var card in deck.keys) {
-              if (card.name == 'Kampfzeppelin') {
-                if (deck[card]?.activationState == null) {
-                  deck[card]?.activationState = false;
-                }
-              }
+          if (activeDeck(deck).where((element) => element.cardType == CardType.army).isEmpty ||
+              activeDeck(deck).where((card) => card.cardType == CardType.weather).isNotEmpty) {
+            if (deck[tis]?.activationState == null) {
+              deck[tis]?.activationState = false;
             }
           }
         },
@@ -1267,13 +1263,9 @@ class Deck {
         false,
         27,
         (deck, tis) {
-          if (deck.keys.where((card) => card.cardType == CardType.flame).isEmpty) {
-            for (var card in deck.keys) {
-              if (card.name == 'Rauch') {
-                if (deck[card]?.activationState == null) {
-                  deck[card]?.activationState = false;
-                }
-              }
+          if (activeDeck(deck).where((card) => card.cardType == CardType.flame).isEmpty) {
+            if (deck[tis]?.activationState == null) {
+              deck[tis]?.activationState = false;
             }
           }
         },
