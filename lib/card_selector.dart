@@ -54,18 +54,21 @@ class CardSelectorState extends State<CardSelector> {
                     color: card.cardType.color,
                   ),
                   child: Center(
-                    child: Text(
-                      '${card.baseStrength}',
-                      style: TextStyle(
-                        color: card.cardType == game.CardType.army ? Colors.white : Colors.black,
+                    child: FittedBox(
+                      fit: BoxFit.fitWidth,
+                      child: Text(
+                        '${card.baseStrength}',
+                        style: TextStyle(
+                          color: card.cardType == game.CardType.army ? Colors.white : Colors.black,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.clip,
                       ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
                     ),
                   ),
                 ),
               ),
-              Expanded(
+              Flexible(
                 flex: 5,
                 child: Align(
                   alignment: Alignment.centerLeft,
