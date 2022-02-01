@@ -208,14 +208,17 @@ class HandWidget extends State<FantastischeReiche> {
       onPressed: () async {
         final result = await Navigator.push(
           context,
-          MaterialPageRoute<game.Cards>(builder: (context) {
+          MaterialPageRoute<List<game.Cards>>(builder: (context) {
             return CardSelector(
               selector: (card) => !_hand.keys.map((card) => card.id).contains(card.id),
+              multiselect: true,
             );
           }),
         );
         if (result != null && _hand.length <= 8) {
-          _addCard(result);
+          for (var id in result) {
+            _addCard(id);
+          }
         }
         _saveHand();
       },

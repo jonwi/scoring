@@ -3,8 +3,9 @@ import 'package:flutter/material.dart';
 import 'card.dart' as game;
 
 class CardSelector extends StatefulWidget {
-  const CardSelector({Key? key, this.selector}) : super(key: key);
+  const CardSelector({Key? key, this.selector, this.multiselect = false}) : super(key: key);
   final bool Function(game.Card)? selector;
+  final bool multiselect;
 
   @override
   State<StatefulWidget> createState() {
@@ -15,6 +16,7 @@ class CardSelector extends StatefulWidget {
 class CardSelectorState extends State<CardSelector> {
   late List<game.Card> _filtered;
   late final Map<game.Card, bool> _expanded = {};
+  late final Map<game.Card, bool> _selected = {};
 
   @override
   void initState() {
@@ -23,75 +25,106 @@ class CardSelectorState extends State<CardSelector> {
     for (var card in _filtered) {
       _expanded[card] = false;
     }
+    for (var card in _filtered) {
+      _selected[card] = false;
+    }
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: ListView(
-      children: _filtered.map((card) {
-        return ListTile(
-          subtitle: AnimatedOpacity(
-              opacity: _expanded[card]! ? 1 : 0,
-              duration: const Duration(milliseconds: 700),
-              child: Visibility(
-                  visible: _expanded[card]!,
-                  child: Row(children: [
-                    const Spacer(),
-                    Expanded(flex: 5, child: Wrap(children: [Center(child: card.description)])),
-                    const Spacer(),
-                  ]))),
-          title: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Expanded(
-                child: Container(
-                  margin: const EdgeInsets.all(15),
-                  decoration: BoxDecoration(
-                    boxShadow: [BoxShadow(color: card.cardType.color, spreadRadius: 10)],
-                    borderRadius: BorderRadius.circular(16),
-                    color: card.cardType.color,
-                  ),
-                  child: Center(
-                    child: FittedBox(
-                      fit: BoxFit.fitWidth,
-                      child: Text(
-                        '${card.baseStrength}',
-                        style: TextStyle(
-                          color: card.cardType == game.CardType.army ? Colors.white : Colors.black,
+      body: ListView(
+        children: _filtered.map((card) {
+          return ListTile(
+            selected: _selected[card]!,
+            selectedTileColor: Colors.grey,
+            subtitle: AnimatedOpacity(
+                opacity: _expanded[card]! ? 1 : 0,
+                duration: const Duration(milliseconds: 700),
+                child: Visibility(
+                    visible: _expanded[card]!,
+                    child: Row(children: [
+                      const Spacer(),
+                      Expanded(flex: 5, child: Wrap(children: [Center(child: card.description)])),
+                      const Spacer(),
+                    ]))),
+            title: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: Container(
+                    margin: const EdgeInsets.all(15),
+                    decoration: BoxDecoration(
+                      boxShadow: [BoxShadow(color: card.cardType.color, spreadRadius: 10)],
+                      borderRadius: BorderRadius.circular(16),
+                      color: card.cardType.color,
+                    ),
+                    child: Center(
+                      child: FittedBox(
+                        fit: BoxFit.fitWidth,
+                        child: Text(
+                          '${card.baseStrength}',
+                          style: TextStyle(
+                            color: card.cardType == game.CardType.army ? Colors.white : Colors.black,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.clip,
                         ),
-                        maxLines: 1,
-                        overflow: TextOverflow.clip,
                       ),
                     ),
                   ),
                 ),
-              ),
-              Flexible(
-                flex: 5,
-                child: Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(card.name),
+                Flexible(
+                  flex: 5,
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(card.name),
+                  ),
                 ),
-              ),
-              Flexible(
-                child: IconButton(
-                  icon: _expanded[card]! ? const Icon(Icons.expand_less) : const Icon(Icons.expand_more),
-                  onPressed: () {
-                    setState(() {
-                      _expanded[card] = !_expanded[card]!;
-                    });
-                  },
-                ),
-              )
-            ],
-          ),
-          onTap: () {
-            Navigator.pop(context, card.id);
-          },
-        );
-      }).toList(),
-    ));
+                Flexible(
+                  child: IconButton(
+                    icon: _expanded[card]! ? const Icon(Icons.expand_less) : const Icon(Icons.expand_more),
+                    onPressed: () {
+                      setState(() {
+                        _expanded[card] = !_expanded[card]!;
+                      });
+                    },
+                  ),
+                )
+              ],
+            ),
+            onTap: () {
+              if (widget.multiselect) {
+                Navigator.pop<List<game.Cards>>(context, [card.id]);
+              } else {
+                Navigator.pop<game.Cards>(context, card.id);
+              }
+            },
+            onLongPress: () {
+              if (widget.multiselect) {
+                setState(() {
+                  _selected[card] = !_selected[card]!;
+                });
+              }
+            },
+          );
+        }).toList(),
+      ),
+      floatingActionButton: widget.multiselect
+          ? FloatingActionButton(
+              child: const Icon(Icons.check),
+              backgroundColor:
+                  _selected.values.fold<bool>(false, (previousValue, element) => previousValue || element)
+                      ? null
+                      : Colors.grey,
+              onPressed: () {
+                List<game.Cards> result =
+                    _selected.entries.where((element) => element.value).map((e) => e.key.id).toList();
+                Navigator.pop<List<game.Cards>>(context, result);
+              },
+            )
+          : null,
+    );
   }
 }
