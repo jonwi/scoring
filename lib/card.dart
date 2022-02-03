@@ -141,7 +141,7 @@ class Deck {
           const TextSpan(text: '.')
         ])),
         (deck, tis) {
-          return 5 * amountOf(activeDeck(deck), {CardType.leader}, ids: {Cards.kaiserin});
+          return 5 * amountOf(activeDeck(deck), {CardType.leader}, ids: {tis.id});
         },
         haufheben: (deck, tis) {}),
     Card(
@@ -207,7 +207,7 @@ class Deck {
           const TextSpan(text: '.')
         ])),
         (deck, tis) {
-          return amountOf(activeDeck(deck), {CardType.land}, ids: {Cards.leichteKavallerie}) * 2;
+          return amountOf(activeDeck(deck), {CardType.land}, ids: {tis.id}) * 2;
         },
         haufheben: (deck, tis) {}),
     Card(
@@ -219,7 +219,7 @@ class Deck {
         (deck, tis) {},
         (deck, tis) {
           if (contains(activeDeck(deck), 'Waldläufer')) return 0;
-          return amountOf(activeDeck(deck), {CardType.army}, ids: {Cards.zwergeninfanterie}) * -2;
+          return amountOf(activeDeck(deck), {CardType.army}, ids: {tis.id}) * -2;
         },
         RichText(
             text: TextSpan(style: const TextStyle(color: Colors.black), children: [
@@ -671,7 +671,7 @@ class Deck {
         4,
         (deck, tis) {},
         (deck, tis) {
-          return amountOf(activeDeck(deck), {CardType.flame}, ids: {Cards.feuerwesen}) * 15;
+          return amountOf(activeDeck(deck), {CardType.flame}, ids: {tis.id}) * 15;
         },
         RichText(
             text: TextSpan(style: const TextStyle(color: Colors.black), children: [
@@ -824,7 +824,7 @@ class Deck {
         4,
         (deck, tis) {},
         (deck, tis) {
-          return amountOf(activeDeck(deck), {CardType.flood}, ids: {Cards.wasserwesen}) * 15;
+          return amountOf(activeDeck(deck), {CardType.flood}, ids: {tis.id}) * 15;
         },
         RichText(
             text: TextSpan(style: const TextStyle(color: Colors.black), children: [
@@ -1022,7 +1022,7 @@ class Deck {
         4,
         (deck, tis) {},
         (deck, tis) {
-          return amountOf(activeDeck(deck), {CardType.land}, ids: {Cards.erdwesen}) * 15;
+          return amountOf(activeDeck(deck), {CardType.land}, ids: {tis.id}) * 15;
         },
         RichText(
             text: TextSpan(style: const TextStyle(color: Colors.black), children: [
@@ -1316,7 +1316,7 @@ class Deck {
         4,
         (deck, tis) {},
         (deck, tis) {
-          return amountOf(activeDeck(deck), {CardType.weather}, ids: {Cards.luftwesen}) * 15;
+          return amountOf(activeDeck(deck), {CardType.weather}, ids: {tis.id}) * 15;
         },
         RichText(
             text: TextSpan(style: const TextStyle(color: Colors.black), children: [
@@ -1442,8 +1442,7 @@ class Deck {
           const TextSpan(text: '.')
         ])),
         (deck, tis) {
-          return amountOf(activeDeck(deck), {CardType.leader, CardType.wizard}, ids: {Cards.hexenmeister}) *
-              10;
+          return amountOf(activeDeck(deck), {CardType.leader, CardType.wizard}, ids: {tis.id}) * 10;
         },
         haufheben: (deck, tis) {}),
     Card(
