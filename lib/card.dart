@@ -928,7 +928,6 @@ class Deck {
         haufheben: (deck, tis) {
           for (var card in deck.keys) {
             if (card.cardType == CardType.flood) {
-              deck[card]?.activationState = true;
               card.hpenalty = (deck, tis) => 0;
               card.hblock = (deck, tis) {};
             }
@@ -964,7 +963,6 @@ class Deck {
         haufheben: (deck, tis) {
           for (var card in deck.keys) {
             if (card.cardType == CardType.weather) {
-              deck[card]?.activationState = true;
               card.hpenalty = (deck, tis) => 0;
               card.hblock = (deck, tis) {};
             }
@@ -1394,7 +1392,6 @@ class Deck {
         haufheben: (deck, tis) {
           for (var card in deck.keys) {
             if (card.cardType == CardType.beast) {
-              deck[card]?.activationState = true;
               card.hpenalty = (deck, tis) => 0;
               card.hblock = (deck, tis) {};
             }
