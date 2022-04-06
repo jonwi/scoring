@@ -2026,7 +2026,7 @@ class Deck {
             if (playerNumber != null) {
               tis.hbonus = (game, tis) => playerNumber * 10;
             }
-          }), // TODO: active machen um Spieleranzahl zu gestimmen
+          }),
       Card(
           Cards.daemon,
           Cards.daemon.cardName,
