@@ -39,6 +39,7 @@ dependencies:
   hive_flutter:
   uuid:
   flutter_svg:
+  numberpicker:
 
 
   # The following adds the Cupertino Icons font to your application.

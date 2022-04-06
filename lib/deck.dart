@@ -3,6 +3,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart' as mat;
 import 'package:flutter/material.dart' hide Card;
+import 'package:scoring/numberpicker.dart';
 import 'package:scoring/type_selector.dart';
 
 import 'card.dart';
@@ -2016,7 +2017,16 @@ class Deck {
           (game, tis) {
             return 0;
           },
-          haufheben: (hand, Card tis) {}), // TODO: active machen um Spieleranzahl zu gestimmen
+          haufheben: (hand, Card tis) {},
+          haction: (tis, context, game) async {
+            final int? playerNumber =
+                await Navigator.push<int>(context, MaterialPageRoute<int>(builder: (context) {
+              return const NumberPickerWidget();
+            }));
+            if (playerNumber != null) {
+              tis.hbonus = (game, tis) => playerNumber * 10;
+            }
+          }), // TODO: active machen um Spieleranzahl zu gestimmen
       Card(
           Cards.daemon,
           Cards.daemon.cardName,
