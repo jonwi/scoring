@@ -3,7 +3,6 @@ import 'dart:math';
 
 import 'package:flutter/material.dart' as mat;
 import 'package:flutter/material.dart' hide Card;
-import 'package:scoring/settings.dart';
 import 'package:scoring/type_selector.dart';
 
 import 'card.dart';
@@ -11,8 +10,8 @@ import 'card_selector.dart';
 import 'game.dart';
 
 class Deck {
-  Iterable<Card> get cards {
-    if (Settings.getInstance().isExpansion) {
+  Iterable<Card> cards(isExpansion) {
+    if (isExpansion) {
       return expansionIDs().map((id) => allCards().firstWhere((element) => element.id == id));
     }
     return standardIDs().map((id) => allCards().firstWhere((element) => element.id == id));
@@ -548,6 +547,7 @@ class Deck {
             final cardID = await Navigator.push(context, MaterialPageRoute<Cards>(builder: (context) {
               return CardSelector(
                 selector: (c) => game.cardsHand.map((e) => e.name).contains(c.name) && c.name != tis.name,
+                isExpansion: game.isExpansion,
               );
             }));
             if (cardID != null) {
@@ -1013,6 +1013,7 @@ class Deck {
                 selector: (card) =>
                     game.cardsHand.map((e) => e.name).contains(card.name) &&
                     (card.cardType == CardType.flame || card.cardType == CardType.flood),
+                isExpansion: game.isExpansion,
               );
             }));
             if (cardID != null) {
@@ -1073,16 +1074,18 @@ class Deck {
           haction: (tis, context, game) async {
             final cardId = await Navigator.push(context, MaterialPageRoute<Cards>(builder: (context) {
               return CardSelector(
-                  selector: (card) => {
-                        CardType.artifact,
-                        CardType.leader,
-                        CardType.wizard,
-                        CardType.weapon,
-                        CardType.beast,
-                      }.contains(card.cardType));
+                selector: (card) => {
+                  CardType.artifact,
+                  CardType.leader,
+                  CardType.wizard,
+                  CardType.weapon,
+                  CardType.beast,
+                }.contains(card.cardType),
+                isExpansion: game.isExpansion,
+              );
             }));
             if (cardId != null) {
-              Card chosen = Deck().cards.firstWhere((element) => element.id == cardId);
+              Card chosen = Deck().cards(game.isExpansion).firstWhere((element) => element.id == cardId);
               if ({
                 CardType.artifact,
                 CardType.leader,
@@ -1126,16 +1129,18 @@ class Deck {
           haction: (tis, context, game) async {
             final cardID = await Navigator.push(context, MaterialPageRoute<Cards>(builder: (context) {
               return CardSelector(
-                  selector: (card) => {
-                        CardType.army,
-                        CardType.land,
-                        CardType.weather,
-                        CardType.flood,
-                        CardType.flame
-                      }.contains(card.cardType));
+                selector: (card) => {
+                  CardType.army,
+                  CardType.land,
+                  CardType.weather,
+                  CardType.flood,
+                  CardType.flame
+                }.contains(card.cardType),
+                isExpansion: game.isExpansion,
+              );
             }));
             if (cardID != null) {
-              Card chosen = Deck().cards.firstWhere((element) => element.id == cardID);
+              Card chosen = Deck().cards(game.isExpansion).firstWhere((element) => element.id == cardID);
               if ({CardType.army, CardType.land, CardType.weather, CardType.flood, CardType.flame}
                   .contains(chosen.cardType)) {
                 tis.name = chosen.name;
@@ -1167,10 +1172,12 @@ class Deck {
               return CardSelector(
                 selector: (card) =>
                     game.cardsHand.map((e) => e.id).contains(card.id) && card.id != Cards.doppelgaenger,
+                isExpansion: game.isExpansion,
               );
             }));
             if (cardID != null) {
-              Card chosen = Deck().cards.where((element) => element.id == cardID).elementAt(0);
+              Card chosen =
+                  Deck().cards(game.isExpansion).where((element) => element.id == cardID).elementAt(0);
               tis.name = chosen.name;
               tis.hpenalty = chosen.hpenalty;
               tis.cardType = chosen.cardType;
@@ -2201,7 +2208,7 @@ class Deck {
               TextSpan(text: 'Gebäude', style: TextStyle(color: CardType.building.color)),
               const TextSpan(text: ' . HEBT das Wort '),
               TextSpan(text: 'Armee', style: TextStyle(color: CardType.army.color)),
-              const TextSpan(text: ' von allen Strafen AUF.'), // TODO: impl.
+              const TextSpan(text: ' von allen Strafen AUF.'),
             ],
           )),
           (game, tis) {
@@ -2321,17 +2328,19 @@ class Deck {
           haction: (tis, context, game) async {
             final cardID = await Navigator.push(context, MaterialPageRoute<Cards>(builder: (context) {
               return CardSelector(
-                  selector: (card) => {
-                        CardType.army,
-                        CardType.land,
-                        CardType.weather,
-                        CardType.flood,
-                        CardType.flame,
-                        CardType.building
-                      }.contains(card.cardType));
+                selector: (card) => {
+                  CardType.army,
+                  CardType.land,
+                  CardType.weather,
+                  CardType.flood,
+                  CardType.flame,
+                  CardType.building
+                }.contains(card.cardType),
+                isExpansion: game.isExpansion,
+              );
             }));
             if (cardID != null) {
-              Card chosen = Deck().cards.firstWhere((element) => element.id == cardID);
+              Card chosen = Deck().cards(game.isExpansion).firstWhere((element) => element.id == cardID);
               tis.name = chosen.name;
               tis.cardType = chosen.cardType;
             }
@@ -2395,17 +2404,19 @@ class Deck {
           haction: (tis, context, game) async {
             final cardId = await Navigator.push(context, MaterialPageRoute<Cards>(builder: (context) {
               return CardSelector(
-                  selector: (card) => {
-                        CardType.artifact,
-                        CardType.leader,
-                        CardType.wizard,
-                        CardType.weapon,
-                        CardType.beast,
-                        CardType.undead,
-                      }.contains(card.cardType));
+                selector: (card) => {
+                  CardType.artifact,
+                  CardType.leader,
+                  CardType.wizard,
+                  CardType.weapon,
+                  CardType.beast,
+                  CardType.undead,
+                }.contains(card.cardType),
+                isExpansion: game.isExpansion,
+              );
             }));
             if (cardId != null) {
-              Card chosen = Deck().cards.firstWhere((element) => element.id == cardId);
+              Card chosen = Deck().cards(game.isExpansion).firstWhere((element) => element.id == cardId);
               tis.name = chosen.name;
               tis.cardType = chosen.cardType;
             }
@@ -2436,10 +2447,12 @@ class Deck {
           haction: (tis, context, game) async {
             final cardId = await Navigator.push(context, MaterialPageRoute<Cards>(builder: (context) {
               return CardSelector(
-                  selector: (card) => game.cardsHand.where((c) => !game.isActiveHand(c)).contains(card));
+                selector: (card) => game.cardsHand.where((c) => !game.isActiveHand(c)).contains(card),
+                isExpansion: game.isExpansion,
+              );
             }));
             if (cardId != null) {
-              Card chosen = Deck().cards.firstWhere((element) => element.id == cardId);
+              Card chosen = Deck().cards(game.isExpansion).firstWhere((element) => element.id == cardId);
               game.setUnblockable(chosen);
             }
           }),

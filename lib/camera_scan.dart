@@ -9,9 +9,10 @@ import 'card.dart';
 import 'deck.dart';
 
 class CameraScan extends StatefulWidget {
-  const CameraScan({Key? key, required this.camera}) : super(key: key);
+  const CameraScan({Key? key, required this.camera, required this.isExpansion}) : super(key: key);
 
   final CameraDescription camera;
+  final bool isExpansion;
 
   @override
   State<StatefulWidget> createState() {
@@ -153,7 +154,7 @@ class TakePictureScreenState extends State<CameraScan> {
       }
       for (TextBlock block in recognisedText.blocks) {
         for (TextLine line in block.lines) {
-          var list = Deck().cards.map((card) => card.id).where((id) {
+          var list = Deck().cards(widget.isExpansion).map((card) => card.id).where((id) {
             final String text = line.text.replaceAll(RegExp('[0-9 ,.)]'), '');
             var similarityTo = text.similarityTo(id.cardName.replaceAll(' ', ''));
             if (text == id.cardName.replaceAll(' ', '')) {
@@ -182,8 +183,8 @@ class TakePictureScreenState extends State<CameraScan> {
         }
       }
       for (var name in foundCards) {
-        _cards.putIfAbsent(
-            Deck().cards.firstWhere((element) => element.name == name).id, () => _cards.length);
+        _cards.putIfAbsent(Deck().cards(widget.isExpansion).firstWhere((element) => element.name == name).id,
+            () => _cards.length);
       }
       setState(() {});
     } catch (e) {

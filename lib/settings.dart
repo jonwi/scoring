@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 class Settings {
   static Settings? instance;
 
-  // TODO: Bei Änderung muss die Liste mit Karten eventuell erneuert werden.
   bool isExpansion;
 
   Settings._(this.isExpansion);
@@ -24,16 +23,23 @@ class SettingsWidget extends StatefulWidget {
 }
 
 class SettingsState extends State<SettingsWidget> {
+  bool _isExpansion = Settings.getInstance().isExpansion;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Einstellungen'),
+        title: const Text('Einstellungen'),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.pop(context, _isExpansion);
+          },
+        ),
       ),
       body: CheckboxListTile(
-        value: Settings.getInstance().isExpansion,
+        value: _isExpansion,
         onChanged: (val) => {
-          setState(() => {Settings.getInstance().isExpansion = !Settings.getInstance().isExpansion})
+          setState(() => {_isExpansion = !_isExpansion})
         },
         title: const Text('Erweiterung'),
       ),

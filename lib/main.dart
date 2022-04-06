@@ -28,7 +28,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.brown,
       ),
-      home: FantastischeReiche(game: Game(Hand(), Ablage())),
+      home: FantastischeReiche(game: Game(Hand(), Ablage(), true)),
     );
   }
 }

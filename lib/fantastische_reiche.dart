@@ -1,7 +1,6 @@
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:hive/hive.dart';
 import 'package:scoring/camera_scan.dart';
 import 'package:scoring/settings.dart';
 
@@ -50,14 +49,16 @@ class HandWidget extends State<FantastischeReiche> {
         actions: [
           IconButton(
               onPressed: () async {
-                _game = Game(Hand(), Ablage());
-                var preSetting = Settings.getInstance().isExpansion;
-                await Navigator.push(context, MaterialPageRoute(builder: (context) {
+                bool? result = await Navigator.push<bool>(context, MaterialPageRoute(builder: (context) {
                   return const SettingsWidget();
                 }));
                 setState(() {
-                  if (preSetting != Settings.getInstance().isExpansion) {
-                    _page = 1;
+                  if (result != null) {
+                    if (Settings.getInstance().isExpansion != result) {
+                      _page = 1;
+                      Settings.getInstance().isExpansion = result;
+                      _game = Game(Hand(), Ablage(), Settings.getInstance().isExpansion);
+                    }
                   }
                 });
               },
@@ -75,7 +76,7 @@ class HandWidget extends State<FantastischeReiche> {
         children: [
           _buildHistory(context),
           _buildHand(),
-          if (Settings.getInstance().isExpansion) _buildAblage(),
+          if (_game.isExpansion) _buildAblage(),
         ],
       ),
       bottomNavigationBar: BottomNavigationBar(
@@ -92,7 +93,7 @@ class HandWidget extends State<FantastischeReiche> {
                   isHandPage() ? Theme.of(context).primaryColor : Theme.of(context).bottomAppBarTheme.color,
             ),
           ),
-          if (Settings.getInstance().isExpansion)
+          if (_game.isExpansion)
             BottomNavigationBarItem(
               label: 'Ablage',
               icon: SvgPicture.asset(
@@ -169,7 +170,7 @@ class HandWidget extends State<FantastischeReiche> {
           ElevatedButton(
               onPressed: () {
                 setState(() {
-                  _game = Game(Hand(), Ablage());
+                  _game = Game(Hand(), Ablage(), Settings.getInstance().isExpansion);
                 });
               },
               child: const Text('Neue Hand')),
@@ -242,8 +243,6 @@ class HandWidget extends State<FantastischeReiche> {
             .toList());
   }
 
-  Box<Map<int, List<game.Cards>>> _getHandsBox() => Hive.box<Map<int, List<game.Cards>>>('hands');
-
   /// floating button to go to scanner
   FloatingActionButton _buildScanButton(BuildContext context) {
     return FloatingActionButton(
@@ -254,7 +253,10 @@ class HandWidget extends State<FantastischeReiche> {
           final cameras = await availableCameras();
           final firstCamera = cameras.first;
           var result = await Navigator.push<Set<game.Cards>>(context, MaterialPageRoute(builder: (context) {
-            return CameraScan(camera: firstCamera);
+            return CameraScan(
+              camera: firstCamera,
+              isExpansion: _game.isExpansion,
+            );
           }));
           if (result != null) {
             setState(() {
@@ -282,6 +284,7 @@ class HandWidget extends State<FantastischeReiche> {
                   ? (card) => !_game.cardsHand.map((card) => card.id).contains(card.id)
                   : (card) => !_game.cardsAblage.map((e) => e.id).contains(card.id),
               multiselect: true,
+              isExpansion: _game.isExpansion,
             );
           }),
         );

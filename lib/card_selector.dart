@@ -4,9 +4,11 @@ import 'card.dart' as game;
 import 'deck.dart';
 
 class CardSelector extends StatefulWidget {
-  const CardSelector({Key? key, this.selector, this.multiselect = false}) : super(key: key);
+  const CardSelector({Key? key, this.selector, this.multiselect = false, required this.isExpansion})
+      : super(key: key);
   final bool Function(game.Card)? selector;
   final bool multiselect;
+  final bool isExpansion;
 
   @override
   State<StatefulWidget> createState() {
@@ -21,8 +23,9 @@ class CardSelectorState extends State<CardSelector> {
 
   @override
   void initState() {
-    _filtered =
-        widget.selector != null ? Deck().cards.where(widget.selector!).toList() : Deck().cards.toList();
+    _filtered = widget.selector != null
+        ? Deck().cards(widget.isExpansion).where(widget.selector!).toList()
+        : Deck().cards(widget.isExpansion).toList();
     for (var card in _filtered) {
       _expanded[card] = false;
     }

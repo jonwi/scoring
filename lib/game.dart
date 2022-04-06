@@ -1,6 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import 'package:hive/hive.dart';
-import 'package:scoring/settings.dart';
 
 import 'ablage.dart';
 import 'card.dart';
@@ -10,12 +9,13 @@ import 'hand.dart';
 class Game {
   final Hand _hand;
   final Ablage _ablage;
+  final bool isExpansion;
 
   int sum = 0;
   int? id;
   int maxSum = 0;
 
-  Game(this._hand, this._ablage);
+  Game(this._hand, this._ablage, this.isExpansion);
 
   Future<void> save() async {
     var box = getGamesBox();
@@ -23,6 +23,9 @@ class Game {
     map[sum] = _hand.cards.map((card) => card.id).toList();
     //TODO: Magic Number here that cant be reached
     map[100000] = _ablage.cards.map((card) => card.id).toList();
+    if (!isExpansion) {
+      map[80000] = [];
+    }
     if (id == null) {
       box.add(map).then((value) => id = value);
     } else {
@@ -39,17 +42,18 @@ class Game {
   }
 
   static Game parseMap(Map<int, List<Cards>> map, int id) {
+    bool isExpansion = map[80000] == null ? true : false;
     var handEntry = map.entries.first;
     Hand hand = Hand();
     for (Cards id in handEntry.value) {
-      hand.addCard(Deck().cards.firstWhere((element) => element.id == id));
+      hand.addCard(Deck().cards(isExpansion).firstWhere((element) => element.id == id));
     }
     var ablageEntry = map.entries.last;
     Ablage ablage = Ablage();
     for (Cards id in ablageEntry.value) {
-      ablage.addCard(Deck().cards.firstWhere((c) => c.id == id));
+      ablage.addCard(Deck().cards(isExpansion).firstWhere((c) => c.id == id));
     }
-    Game game = Game(hand, ablage);
+    Game game = Game(hand, ablage, isExpansion);
     game.id = id;
     game.maxSum = handEntry.key;
     return game;
@@ -75,7 +79,7 @@ class Game {
 
   void addCardsHandByID(List<Cards> ids) {
     for (Cards id in ids) {
-      _hand.addCard(Deck().cards.firstWhere((element) => element.id == id));
+      _hand.addCard(Deck().cards(isExpansion).firstWhere((element) => element.id == id));
     }
     calculateSum();
     save();
@@ -83,20 +87,20 @@ class Game {
 
   void addCardsAblageByID(List<Cards> ids) {
     for (Cards id in ids) {
-      _ablage.addCard(Deck().cards.firstWhere((element) => element.id == id));
+      _ablage.addCard(Deck().cards(isExpansion).firstWhere((element) => element.id == id));
     }
     calculateSum();
     save();
   }
 
   void addCardHandByID(Cards id) {
-    _hand.addCard(Deck().cards.firstWhere((element) => element.id == id));
+    _hand.addCard(Deck().cards(isExpansion).firstWhere((element) => element.id == id));
     calculateSum();
     save();
   }
 
   void addCardAblageByID(Cards id) {
-    _ablage.addCard(Deck().cards.firstWhere((c) => c.id == id));
+    _ablage.addCard(Deck().cards(isExpansion).firstWhere((c) => c.id == id));
     calculateSum();
     save();
   }
@@ -154,7 +158,7 @@ class Game {
   }
 
   void resetHand() {
-    _hand.reset();
+    _hand.reset(isExpansion);
     calculateSum();
   }
 
@@ -176,7 +180,7 @@ class Game {
   int maxCardsHand() {
     int size = 7;
     if (cardsHand.map((e) => e.id).contains(Cards.totenbeschwoerer)) size++;
-    if (Settings.getInstance().isExpansion) size++;
+    if (isExpansion) size++;
     if (cardsHand.map((e) => e.id).contains(Cards.kobold)) size++;
     return size;
   }

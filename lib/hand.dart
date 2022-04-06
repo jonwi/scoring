@@ -50,7 +50,7 @@ class Hand {
     }
   }
 
-  // TODO: visible should be traked in the widget using visible
+  // TODO: visible should be tracked in the widget using visible
   bool isVisible(Card card) {
     if (_cards.containsKey(card)) {
       return _cards[card]!.visibility;
@@ -64,9 +64,9 @@ class Hand {
     }
   }
 
-  void reset() {
+  void reset(bool isExpansion) {
     for (Card card in cards) {
-      Card cop = Deck().cards.firstWhere((element) => element.id == card.id);
+      Card cop = Deck().cards(isExpansion).firstWhere((element) => element.id == card.id);
       _cards[cop] = _cards.remove(card)!;
     }
   }
