@@ -37,7 +37,8 @@ dependencies:
   string_similarity:
   hive:
   hive_flutter:
-  uuid: 3.0.5
+  uuid:
+  flutter_svg:
 
 
   # The following adds the Cupertino Icons font to your application.
@@ -72,7 +73,11 @@ flutter:
   # assets:
   #   - images/a_dot_burr.jpeg
   #   - images/a_dot_ham.jpeg
-
+  assets:
+    - assets/hand.svg
+    - assets/ablage.svg
+    - assets/ablagenorm.svg
+    - assets/handBorderless.svg
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.
 

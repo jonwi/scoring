@@ -121,6 +121,46 @@ class CardsAdapter extends TypeAdapter<Cards> {
         return Cards.magierin;
       case 53:
         return Cards.hofnarr;
+      case 54:
+        return Cards.gruft;
+      case 55:
+        return Cards.ghul;
+      case 56:
+        return Cards.gespenst;
+      case 57:
+        return Cards.dunkleKoenigin;
+      case 58:
+        return Cards.kapelle;
+      case 59:
+        return Cards.dschinn;
+      case 60:
+        return Cards.daemon;
+      case 61:
+        return Cards.quelleDesLebensNeu;
+      case 62:
+        return Cards.burg;
+      case 63:
+        return Cards.totenbeschwoererNeu;
+      case 64:
+        return Cards.todesritter;
+      case 65:
+        return Cards.kobold;
+      case 66:
+        return Cards.waldlaeuferNeu;
+      case 67:
+        return Cards.glockenturmNeu;
+      case 68:
+        return Cards.grosseFlutNeu;
+      case 69:
+        return Cards.spiegelungNeu;
+      case 70:
+        return Cards.weltenbaumNeu;
+      case 71:
+        return Cards.gestaltwandlerNeu;
+      case 72:
+        return Cards.engel;
+      case 73:
+        return Cards.lich;
       default:
         return Cards.koenig;
     }
@@ -290,6 +330,66 @@ class CardsAdapter extends TypeAdapter<Cards> {
         break;
       case Cards.hofnarr:
         writer.writeByte(53);
+        break;
+      case Cards.gruft:
+        writer.writeByte(54);
+        break;
+      case Cards.ghul:
+        writer.writeByte(55);
+        break;
+      case Cards.gespenst:
+        writer.writeByte(56);
+        break;
+      case Cards.dunkleKoenigin:
+        writer.writeByte(57);
+        break;
+      case Cards.kapelle:
+        writer.writeByte(58);
+        break;
+      case Cards.dschinn:
+        writer.writeByte(59);
+        break;
+      case Cards.daemon:
+        writer.writeByte(60);
+        break;
+      case Cards.quelleDesLebensNeu:
+        writer.writeByte(61);
+        break;
+      case Cards.burg:
+        writer.writeByte(62);
+        break;
+      case Cards.totenbeschwoererNeu:
+        writer.writeByte(63);
+        break;
+      case Cards.todesritter:
+        writer.writeByte(64);
+        break;
+      case Cards.kobold:
+        writer.writeByte(65);
+        break;
+      case Cards.waldlaeuferNeu:
+        writer.writeByte(66);
+        break;
+      case Cards.glockenturmNeu:
+        writer.writeByte(67);
+        break;
+      case Cards.grosseFlutNeu:
+        writer.writeByte(68);
+        break;
+      case Cards.spiegelungNeu:
+        writer.writeByte(69);
+        break;
+      case Cards.weltenbaumNeu:
+        writer.writeByte(70);
+        break;
+      case Cards.gestaltwandlerNeu:
+        writer.writeByte(71);
+        break;
+      case Cards.engel:
+        writer.writeByte(72);
+        break;
+      case Cards.lich:
+        writer.writeByte(73);
         break;
     }
   }

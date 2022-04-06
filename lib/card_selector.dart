@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'card.dart' as game;
+import 'deck.dart';
 
 class CardSelector extends StatefulWidget {
   const CardSelector({Key? key, this.selector, this.multiselect = false}) : super(key: key);
@@ -21,7 +22,7 @@ class CardSelectorState extends State<CardSelector> {
   @override
   void initState() {
     _filtered =
-        widget.selector != null ? game.Deck().cards.where(widget.selector!).toList() : game.Deck().cards;
+        widget.selector != null ? Deck().cards.where(widget.selector!).toList() : Deck().cards.toList();
     for (var card in _filtered) {
       _expanded[card] = false;
     }
@@ -66,7 +67,7 @@ class CardSelectorState extends State<CardSelector> {
                         child: Text(
                           '${card.baseStrength}',
                           style: TextStyle(
-                            color: card.cardType == game.CardType.army ? Colors.white : Colors.black,
+                            color: card.cardType.textColor,
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.clip,

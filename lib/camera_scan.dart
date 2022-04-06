@@ -6,6 +6,7 @@ import 'package:google_ml_kit/google_ml_kit.dart';
 import 'package:string_similarity/string_similarity.dart';
 
 import 'card.dart';
+import 'deck.dart';
 
 class CameraScan extends StatefulWidget {
   const CameraScan({Key? key, required this.camera}) : super(key: key);

@@ -1,17 +1,22 @@
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:hive/hive.dart';
 import 'package:scoring/camera_scan.dart';
-import 'package:scoring/type_selector.dart';
+import 'package:scoring/settings.dart';
 
+import 'ablage.dart';
 import 'card.dart' as game;
 import 'card.dart';
 import 'card_selector.dart';
+import 'game.dart';
+import 'hand.dart';
 
 class FantastischeReiche extends StatefulWidget {
-  const FantastischeReiche({Key? key, this.handID, required this.hand}) : super(key: key);
+  const FantastischeReiche({Key? key, this.handID, required this.game}) : super(key: key);
   final int? handID;
-  final Map<game.Card, CardState> hand;
+  final Game game;
 
   @override
   State<StatefulWidget> createState() {
@@ -22,140 +27,218 @@ class FantastischeReiche extends StatefulWidget {
 class HandWidget extends State<FantastischeReiche> {
   @override
   void initState() {
-    _handID = widget.handID;
-    _hand = {...widget.hand};
+    _game = widget.game;
+    _pageController = PageController(initialPage: _page);
     super.initState();
   }
 
-  /// current Strength of the hand
-  int _sum = 0;
-
-  /// id to save and restore the current hand
-  late int? _handID;
-
   /// Card and Active State where true means the card counts towards total and false means its deactivated and visibility
-  late Map<game.Card, CardState> _hand;
+  late Game _game;
+
+  late PageController _pageController;
+
+  int _page = 1;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: _buildAppBar(),
-      drawer: _buildDrawer(context),
-      body: SingleChildScrollView(
-        child: Center(
-          child: ExpansionPanelList(
-            key: Key('${_hand.length}'),
-            children: _hand.entries
-                .map<ExpansionPanel>((entry) => ExpansionPanel(
-                      headerBuilder: (BuildContext context, bool isExpanded) {
-                        return Dismissible(
-                            key: Key(entry.key.id.name),
-                            child: _buildStats(entry),
-                            onDismissed: (direction) {
-                              _removeCard(entry.key);
-                              _saveHand();
-                            },
-                            background: Container(
-                                alignment: AlignmentDirectional.centerEnd,
-                                color: Colors.red,
-                                child:
-                                    Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: const [
-                                  Padding(
-                                      padding: EdgeInsets.only(left: 10),
-                                      child: Icon(Icons.delete, color: Colors.white)),
-                                  Padding(
-                                      padding: EdgeInsets.only(right: 10),
-                                      child: Icon(Icons.delete, color: Colors.white))
-                                ])));
-                      },
-                      body: _buildDescription(entry),
-                      isExpanded: entry.value.visibility,
-                      canTapOnHeader: true,
-                    ))
-                .toList(),
-            expansionCallback: (index, isActive) {
-              setState(() {
-                _hand.entries.elementAt(index).value.visibility = !isActive;
-              });
-            },
-          ),
-        ),
+      appBar: AppBar(
+        title: _page == 0
+            ? const Text('Historie')
+            : _page == 1
+                ? const Text('Hand')
+                : const Text('Ablage'),
+        actions: [
+          IconButton(
+              onPressed: () async {
+                var result = await Navigator.push(context, MaterialPageRoute(builder: (context) {
+                  return const SettingsWidget();
+                }));
+                setState(() {
+                  // Global Settings have to be applied
+                });
+              },
+              icon: const Icon(Icons.settings))
+        ],
       ),
-      bottomNavigationBar: Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
-        ElevatedButton(onPressed: () => _resetActions(), child: const Text('Aktionen rückgängig')),
-        ElevatedButton(
-            onPressed: () {
-              _deleteAll();
-            },
-            child: const Text('Neue Hand')),
-      ]),
-      floatingActionButton: Column(mainAxisAlignment: MainAxisAlignment.end, children: [
-        _buildScanButton(context),
-        _buildAddButton(context),
-      ]),
+      body: PageView(
+        clipBehavior: Clip.none,
+        controller: _pageController,
+        onPageChanged: (newPage) {
+          setState(() {
+            _page = newPage;
+          });
+        },
+        children: [
+          _buildHistory(context),
+          _buildHand(),
+          if (Settings.getInstance().isExpansion) _buildAblage(),
+        ],
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _page,
+        items: [
+          const BottomNavigationBarItem(icon: Icon(Icons.history), label: 'Historie'),
+          BottomNavigationBarItem(
+            label: 'Hand',
+            icon: SvgPicture.asset(
+              'assets/handBorderless.svg',
+              semanticsLabel: 'Hand',
+              height: 25,
+              color: _page == 1 ? Theme.of(context).primaryColor : Theme.of(context).bottomAppBarTheme.color,
+            ),
+          ),
+          if (Settings.getInstance().isExpansion)
+            BottomNavigationBarItem(
+              label: 'Ablage',
+              icon: SvgPicture.asset(
+                'assets/ablagenorm.svg',
+                semanticsLabel: 'Ablage',
+                height: 25,
+                color:
+                    _page == 2 ? Theme.of(context).primaryColor : Theme.of(context).bottomAppBarTheme.color,
+              ),
+            )
+        ],
+        onTap: (index) => {
+          _pageController.animateToPage(index,
+              duration: const Duration(milliseconds: 500), curve: Curves.easeOut)
+        },
+      ),
+      floatingActionButton: _page == 2 || _page == 1
+          ? Column(mainAxisAlignment: MainAxisAlignment.end, children: [
+              _buildScanButton(context),
+              _buildAddButton(context),
+            ])
+          : null,
     );
   }
 
-  /// builds a drawer that shows all hands
-  Drawer _buildDrawer(BuildContext context) {
-    return Drawer(
-      child: Column(children: [
-        const Expanded(
-          flex: 1,
-          child: DrawerHeader(
-            margin: EdgeInsets.all(0),
-            child: Text(
-              'Vergangene Hände',
-              style: TextStyle(fontSize: 25),
+  Widget _buildHand() {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Container(
+          color: Theme.of(context).secondaryHeaderColor,
+          child: Padding(
+            padding: const EdgeInsets.only(top: 10, bottom: 5),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                Text(
+                  'Punkte: ${_game.sum}',
+                  style: TextStyle(fontSize: 22, color: Theme.of(context).primaryColor),
+                ),
+                Row(children: [
+                  Text(
+                    '${_game.lengthHand}',
+                    style: TextStyle(
+                        color: _game.lengthHand > _game.maxCardsHand()
+                            ? Colors.red
+                            : Theme.of(context).primaryColor,
+                        fontSize: 22),
+                  ),
+                  Text('/${_game.maxCardsHand()}',
+                      style: TextStyle(fontSize: 22, color: Theme.of(context).primaryColor)),
+                ])
+              ],
             ),
           ),
         ),
         Expanded(
-          flex: 7,
-          child: ListView(
-              children: _getHandsBox()
-                  .toMap()
-                  .entries
-                  .map((e) => ListTile(
-                        contentPadding: const EdgeInsets.all(0),
-                        title: Row(children: [
-                          Expanded(flex: 5, child: _getName(e.value.entries.first, e.key)),
-                          Expanded(
-                            child: IconButton(
-                              iconSize: 30,
-                              onPressed: () {
-                                setState(() {
-                                  _getHandsBox().delete(e.key);
-                                });
-                              },
-                              icon: const Icon(
-                                Icons.delete,
-                                color: Colors.red,
-                              ),
-                            ),
-                          ),
-                        ]),
-                        onTap: () {
-                          _loadHand(e.key);
-                          Navigator.pop(context);
-                        },
-                      ))
-                  .toList()
-                  .reversed
-                  .toList()),
+          child: SingleChildScrollView(
+            child: ExpansionPanelList(
+              key: Key('${_game.lengthHand}'),
+              children: _game.cardsHand.map<ExpansionPanel>((card) => cardHandPanel(card)).toList(),
+              expansionCallback: (index, isActive) {
+                setState(() {
+                  _game.setVisibleHand(_game.cardsHand.elementAt(index), !isActive);
+                });
+              },
+            ),
+          ),
         ),
-      ]),
+        Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
+          const Spacer(),
+          ElevatedButton(onPressed: () => _game.resetHand(), child: const Text('Aktionen rückgängig')),
+          const Spacer(),
+          ElevatedButton(
+              onPressed: () {
+                setState(() {
+                  _game = Game(Hand(), Ablage());
+                });
+              },
+              child: const Text('Neue Hand')),
+          const Spacer(
+            flex: 3,
+          ),
+        ])
+      ],
     );
   }
 
-  Box<Map<int, List<game.Cards>>> _getHandsBox() => Hive.box<Map<int, List<game.Cards>>>('hands');
-
-  void _deleteAll() {
-    while (_hand.isNotEmpty) {
-      _removeCard(_hand.keys.first);
-    }
-    _handID = null;
+  ExpansionPanel cardHandPanel(game.Card card) {
+    return ExpansionPanel(
+        headerBuilder: (BuildContext context, bool isExpanded) {
+          return Dismissible(
+              key: Key(card.id.name),
+              child: _buildStats(card),
+              onDismissed: (direction) {
+                setState(() {
+                  _game.removeCardHand(card);
+                });
+              },
+              background: Container(
+                  alignment: AlignmentDirectional.centerEnd,
+                  color: Colors.red,
+                  child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: const [
+                    Padding(
+                        padding: EdgeInsets.only(left: 10), child: Icon(Icons.delete, color: Colors.white)),
+                    Padding(
+                        padding: EdgeInsets.only(right: 10), child: Icon(Icons.delete, color: Colors.white))
+                  ])));
+        },
+        body: _buildDescription(card),
+        canTapOnHeader: true,
+        isExpanded: _game.isVisibleHand(card));
   }
+
+  ListView _buildHistory(BuildContext context) {
+    return ListView(
+        children: Game.games()
+            .map((game) => ListTile(
+                  contentPadding: const EdgeInsets.all(0),
+                  title: Row(children: [
+                    Expanded(flex: 5, child: _getName(game)),
+                    Expanded(
+                      child: IconButton(
+                        iconSize: 30,
+                        onPressed: () {
+                          setState(() {
+                            game.delete();
+                          });
+                        },
+                        icon: const Icon(
+                          Icons.delete,
+                          color: Colors.red,
+                        ),
+                      ),
+                    ),
+                  ]),
+                  onTap: () {
+                    setState(() {
+                      _game = Game.load(game.id!);
+                    });
+                    _pageController.animateToPage(1,
+                        duration: const Duration(milliseconds: 500), curve: Curves.easeOut);
+                  },
+                ))
+            .toList()
+            .reversed
+            .toList());
+  }
+
+  Box<Map<int, List<game.Cards>>> _getHandsBox() => Hive.box<Map<int, List<game.Cards>>>('hands');
 
   /// floating button to go to scanner
   FloatingActionButton _buildScanButton(BuildContext context) {
@@ -170,34 +253,15 @@ class HandWidget extends State<FantastischeReiche> {
             return CameraScan(camera: firstCamera);
           }));
           if (result != null) {
-            for (var element in result) {
-              _addCard(element);
-            }
-            _saveHand();
+            setState(() {
+              if (_page == 1) {
+                _game.addCardsHandByID(result.toList());
+              } else {
+                _game.addCardsAblageByID(result.toList());
+              }
+            });
           }
         });
-  }
-
-  /// saves the current hand
-  void _saveHand() {
-    if (_handID == null) {
-      _getHandsBox().add({_sum: _hand.keys.map((card) => card.id).toList()}).then((value) => _handID = value);
-    } else {
-      _getHandsBox().put(_handID, {_sum: _hand.keys.map((card) => card.id).toList()});
-    }
-  }
-
-  /// loads the given hand
-  void _loadHand(int handID) {
-    Map<int, List<Cards>>? map = _getHandsBox().get(handID);
-    if (map != null) {
-      List<Cards> list = map.entries.first.value;
-      _hand = {};
-      for (Cards id in list) {
-        _addCard(id);
-      }
-      _handID = handID;
-    }
   }
 
   /// Floating add button to go to card selector
@@ -210,38 +274,40 @@ class HandWidget extends State<FantastischeReiche> {
           context,
           MaterialPageRoute<List<game.Cards>>(builder: (context) {
             return CardSelector(
-              selector: (card) => !_hand.keys.map((card) => card.id).contains(card.id),
+              selector: (card) => !_game.cardsHand.map((card) => card.id).contains(card.id),
               multiselect: true,
             );
           }),
         );
-        if (result != null && _hand.length <= 8) {
-          for (var id in result) {
-            _addCard(id);
-          }
+        if (result != null && _game.lengthHand <= 8) {
+          setState(() {
+            if (_page == 1) {
+              _game.addCardsHandByID(result);
+            } else {
+              _game.addCardsAblageByID(result);
+            }
+          });
         }
-        _saveHand();
       },
     );
   }
 
   /// description of given card
-  AnimatedOpacity _buildDescription(MapEntry<game.Card, CardState> entry) {
+  AnimatedOpacity _buildDescription(game.Card card) {
     return AnimatedOpacity(
-        opacity: entry.value.visibility ? 1.0 : 0,
+        opacity: _game.isVisibleHand(card) ? 1.0 : 0,
         duration: const Duration(milliseconds: 500),
         child: Visibility(
-            visible: entry.value.visibility,
+            visible: _game.isVisibleHand(card),
             child: Row(children: [
               const Spacer(),
-              Expanded(flex: 5, child: Wrap(children: [Center(child: entry.key.description)])),
+              Expanded(flex: 5, child: Wrap(children: [Center(child: card.description)])),
               const Spacer(),
             ])));
   }
 
   /// Stats containing base strength, name, actionButton, bonus and penalty, and overall total
-  Row _buildStats(MapEntry<game.Card, CardState> entry) {
-    final card = entry.key;
+  Row _buildStats(game.Card card) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
@@ -269,9 +335,7 @@ class HandWidget extends State<FantastischeReiche> {
           flex: 5,
           child: Text(card.name,
               style: TextStyle(
-                  decoration: entry.value.activationState ?? true
-                      ? TextDecoration.none
-                      : TextDecoration.lineThrough)),
+                  decoration: _game.isActiveHand(card) ? TextDecoration.none : TextDecoration.lineThrough)),
         ),
         card.hasAction // actionButton
             ? Expanded(
@@ -281,7 +345,7 @@ class HandWidget extends State<FantastischeReiche> {
                   iconSize: 20,
                   onPressed: card.hasAction
                       ? () {
-                          _performAction(card);
+                          _game.executeAction(context, card);
                         }
                       : () {},
                   color: Colors.white,
@@ -305,10 +369,10 @@ class HandWidget extends State<FantastischeReiche> {
           // bonus - penalty
           flex: 1,
           child: Center(
-            child: Text('${entry.value.isActive() ? card.bonus(_hand) - card.penalty(_hand) : 0}',
+            child: Text('${_game.isVisibleHand(card) ? _game.bonus(card) - _game.penalty(card) : 0}',
                 style: TextStyle(
-                    color: card.bonus(_hand) - card.penalty(_hand) >= 0
-                        ? card.bonus(_hand) - card.penalty(_hand) == 0
+                    color: _game.bonus(card) - _game.penalty(card) >= 0
+                        ? _game.bonus(card) - _game.penalty(card) == 0
                             ? Colors.black
                             : Colors.green
                         : Colors.red)),
@@ -318,10 +382,10 @@ class HandWidget extends State<FantastischeReiche> {
           // total
           flex: 1,
           child: Center(
-            child: Text('${entry.value.isActive() ? card.calculateStrength(_hand) : 0}',
+            child: Text('${_game.isActiveHand(card) ? _game.strength(card) : 0}',
                 style: TextStyle(
-                    color: card.calculateStrength(_hand) >= 0
-                        ? card.calculateStrength(_hand) == 0
+                    color: _game.strength(card) >= 0
+                        ? _game.strength(card) == 0
                             ? Colors.black
                             : Colors.green
                         : Colors.red)),
@@ -334,8 +398,9 @@ class HandWidget extends State<FantastischeReiche> {
               color: Colors.red,
             ),
             onPressed: () {
-              _removeCard(card);
-              _saveHand();
+              setState(() {
+                _game.removeCardHand(card);
+              });
             },
           ),
         ),
@@ -343,198 +408,10 @@ class HandWidget extends State<FantastischeReiche> {
     );
   }
 
-  /// AppBar containing score total and amount of cards in hand
-  AppBar _buildAppBar() {
-    return AppBar(
-      title: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          const Text('Deck'),
-          FittedBox(fit: BoxFit.fitWidth, child: Text('Punkte: $_sum')),
-          Row(children: [
-            Text(
-              '${_hand.length}',
-              style: TextStyle(color: _hand.length > maxCards() ? Colors.red : null),
-            ),
-            Text('/${maxCards()}'),
-          ])
-        ],
-      ),
-    );
-  }
-
-  /// performs the action associated with the card if there is any
-  Future<void> _performAction(game.Card card) async {
-    switch (card.id) {
-      case game.Cards.spiegelung:
-        final cardID = await Navigator.push(context, MaterialPageRoute<game.Cards>(builder: (context) {
-          return CardSelector(
-              selector: (card) => {
-                    game.CardType.army,
-                    game.CardType.land,
-                    game.CardType.weather,
-                    game.CardType.flood,
-                    game.CardType.flame
-                  }.contains(card.cardType));
-        }));
-        if (cardID != null) {
-          game.Card chosen = game.Deck().cards.firstWhere((element) => element.id == cardID);
-          if ({
-            game.CardType.army,
-            game.CardType.land,
-            game.CardType.weather,
-            game.CardType.flood,
-            game.CardType.flame
-          }.contains(chosen.cardType)) {
-            card.name = chosen.name;
-            card.cardType = chosen.cardType;
-            _hand[card] = _hand[card]!;
-          }
-        }
-        break;
-      case game.Cards.gestaltwandler:
-        final cardId = await Navigator.push(context, MaterialPageRoute<game.Cards>(builder: (context) {
-          return CardSelector(
-              selector: (card) => {
-                    game.CardType.artifact,
-                    game.CardType.leader,
-                    game.CardType.wizard,
-                    game.CardType.weapon,
-                    game.CardType.beast,
-                  }.contains(card.cardType));
-        }));
-        if (cardId != null) {
-          game.Card chosen = game.Deck().cards.firstWhere((element) => element.id == cardId);
-          if ({
-            game.CardType.artifact,
-            game.CardType.leader,
-            game.CardType.wizard,
-            game.CardType.weapon,
-            game.CardType.beast,
-          }.contains(chosen.cardType)) {
-            card.name = chosen.name;
-            card.cardType = chosen.cardType;
-            _hand[card] = _hand[card]!;
-          }
-        }
-        break;
-      case game.Cards.doppelgaenger:
-        final cardID = await Navigator.push(context, MaterialPageRoute<game.Cards>(builder: (context) {
-          return CardSelector(
-            selector: (card) =>
-                _hand.keys.map((e) => e.id).contains(card.id) && card.id != game.Cards.doppelgaenger,
-          );
-        }));
-        if (cardID != null) {
-          game.Card chosen = game.Deck().cards.where((element) => element.id == cardID).elementAt(0);
-          card.name = chosen.name;
-          card.hpenalty = chosen.hpenalty;
-          card.cardType = chosen.cardType;
-          card.baseStrength = chosen.baseStrength;
-          card.hblock = chosen.hblock;
-          _hand[card] = _hand[card]!;
-        }
-        break;
-      case game.Cards.buchDerVeraenderung:
-        final cardID = await Navigator.push(context, MaterialPageRoute<game.Cards>(builder: (context) {
-          return CardSelector(
-            selector: (c) => _hand.keys.map((e) => e.name).contains(c.name) && c.name != card.name,
-          );
-        }));
-        if (cardID != null) {
-          final cardType = await Navigator.push(context, MaterialPageRoute<game.CardType>(builder: (context) {
-            return TypeSelector(selector: (type) => type != game.CardType.wild);
-          }));
-          if (cardType != null) {
-            game.Card chosen = _hand.keys.where((element) => element.id == cardID).first;
-            chosen.cardType = cardType;
-            card.hasAction = false;
-          }
-        }
-        break;
-      case game.Cards.insel:
-        final cardID = await Navigator.push(context, MaterialPageRoute<game.Cards>(builder: (context) {
-          return CardSelector(
-            selector: (card) =>
-                _hand.keys.map((e) => e.name).contains(card.name) &&
-                (card.cardType == game.CardType.flame || card.cardType == game.CardType.flood),
-          );
-        }));
-        if (cardID != null) {
-          game.Card chosen = _hand.keys.where((element) => element.id == cardID).first;
-          _hand[chosen]?.activationState = true;
-          chosen.hpenalty = (deck, tis) => 0;
-          chosen.hblock = (deck, tis) {};
-          card.hasAction = false;
-        }
-        break;
-      default:
-        return;
-    }
-    _calculateHand();
-    _saveHand();
-  }
-
-  /// adds the card to the current hand if not yet in there
-  void _addCard(game.Cards cardID) {
-    game.Card card = game.Deck().cards.firstWhere((element) => element.id == cardID);
-    if (!_hand.keys.map((card) => card.id).contains(card.id)) {
-      _hand[card] = CardState();
-      _calculateHand();
-    }
-  }
-
-  /// removes card from the current hand deck will be calculated again, actions might be undone
-  void _removeCard(game.Card card) {
-    _hand.remove(card);
-    if (card.id == game.Cards.insel || card.id == game.Cards.buchDerVeraenderung) {
-      _resetActions();
-    } else {
-      _calculateHand();
-    }
-  }
-
-  /// calculates the strength of _hand unblocks everything, blocks, and then sums every card
-  void _calculateHand() {
-    setState(() {
-      for (MapEntry<game.Card, CardState> entry in _hand.entries) {
-        entry.value.activationState = null;
-      }
-      for (var key in _hand.keys) {
-        key.aufheben(_hand);
-      }
-      for (var key in _hand.keys) {
-        key.block(_hand);
-      }
-      for (var key in _hand.keys) {
-        key.block(_hand);
-      }
-      _sum = _hand.entries
-          .where((e) => e.value.activationState == null || e.value.activationState == true)
-          .fold(0, (previousValue, element) => previousValue + element.key.calculateStrength(_hand));
-    });
-  }
-
-  /// returns the number of cards that are allowed in the current hand
-  int maxCards() {
-    if (_hand.keys.map((e) => e.name).contains('Totenbeschwörer')) return 8;
-    return 7;
-  }
-
-  /// replaces every card in _hand with the original card to undo every change that might have occured.
-  void _resetActions() {
-    for (var entry in _hand.entries.toList()) {
-      game.Card card = game.Deck().cards.firstWhere((element) => element.id == entry.key.id);
-      _hand[card] = _hand.remove(entry.key)!;
-    }
-    _calculateHand();
-  }
-
   /// gets the name of a saved Hand
-  Widget _getName(MapEntry<int, List<Cards>> entry, int id) {
-    Map<CardType, int> map = entry.value
-        .map((id) => Deck().cards.firstWhere((card) => card.id == id).cardType)
-        .fold<Map<CardType, int>>({}, (map, type) {
+  Widget _getName(Game game) {
+    Map<CardType, int> map =
+        game.cardsHand.map((card) => card.cardType).fold<Map<CardType, int>>({}, (map, type) {
       if (map[type] != null) {
         map[type] = map[type]! + 1;
       } else {
@@ -563,10 +440,6 @@ class HandWidget extends State<FantastischeReiche> {
     return Container(
         padding: const EdgeInsets.only(left: 5, right: 5),
         decoration: BoxDecoration(
-          boxShadow: [
-            const BoxShadow(color: Colors.brown, spreadRadius: 0),
-            _handID == id ? const BoxShadow(color: Colors.green, spreadRadius: 2) : const BoxShadow()
-          ],
           borderRadius: BorderRadius.circular(16),
           color: Colors.brown,
         ),
@@ -577,7 +450,7 @@ class HandWidget extends State<FantastischeReiche> {
               margin: const EdgeInsets.all(10),
               child: Center(
                 child: Text(
-                  '${entry.key}',
+                  '${game.maxSum}',
                   style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 20, color: Colors.white),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
@@ -594,16 +467,84 @@ class HandWidget extends State<FantastischeReiche> {
           ),
         ]));
   }
-}
 
-class CardState {
-  bool? activationState;
-  bool visibility;
-
-  CardState({this.visibility = false, this.activationState});
-
-  bool isActive() {
-    if (activationState == null) return true;
-    return activationState!;
+  Widget _buildAblage() {
+    return SingleChildScrollView(
+      child: ExpansionPanelList(
+        children: _game.cardsAblage
+            .map((card) => ExpansionPanel(
+                headerBuilder: (BuildContext context, bool isExpanded) {
+                  return Dismissible(
+                      key: Key(card.id.name),
+                      child: Row(
+                        children: [
+                          Container(
+                              // baseStrength
+                              margin: const EdgeInsets.all(15),
+                              decoration: BoxDecoration(
+                                boxShadow: [BoxShadow(color: card.cardType.color, spreadRadius: 10)],
+                                borderRadius: BorderRadius.circular(16),
+                                color: card.cardType.color,
+                              ),
+                              child: SizedBox(
+                                width: 20,
+                                child: Center(
+                                  child: Text(
+                                    '${card.baseStrength}',
+                                    style: TextStyle(
+                                      color: card.cardType.textColor,
+                                    ),
+                                  ),
+                                ),
+                              )),
+                          Expanded(
+                              // name
+                              flex: 5,
+                              child: Text(
+                                card.name,
+                              )),
+                          FittedBox(
+                            child: IconButton(
+                              icon: const Icon(
+                                Icons.delete,
+                                color: Colors.red,
+                              ),
+                              onPressed: () {
+                                setState(() {
+                                  _game.removeCardAblage(card);
+                                });
+                              },
+                            ),
+                          ),
+                        ],
+                      ),
+                      onDismissed: (direction) {
+                        setState(() {
+                          _game.removeCardAblage(card);
+                        });
+                      },
+                      background: Container(
+                          alignment: AlignmentDirectional.centerEnd,
+                          color: Colors.red,
+                          child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: const [
+                            Padding(
+                                padding: EdgeInsets.only(left: 10),
+                                child: Icon(Icons.delete, color: Colors.white)),
+                            Padding(
+                                padding: EdgeInsets.only(right: 10),
+                                child: Icon(Icons.delete, color: Colors.white))
+                          ])));
+                },
+                body: _buildDescription(card),
+                canTapOnHeader: true,
+                isExpanded: _game.isVisibleAblage(card)))
+            .toList(),
+        expansionCallback: (index, isActive) {
+          setState(() {
+            _game.setVisibleAblage(_game.cardsHand.elementAt(index), !isActive);
+          });
+        },
+      ),
+    );
   }
 }
