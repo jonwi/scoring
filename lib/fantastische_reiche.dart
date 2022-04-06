@@ -1,6 +1,5 @@
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:hive/hive.dart';
 import 'package:scoring/camera_scan.dart';
@@ -45,17 +44,21 @@ class HandWidget extends State<FantastischeReiche> {
       appBar: AppBar(
         title: _page == 0
             ? const Text('Historie')
-            : _page == 1
+            : isHandPage()
                 ? const Text('Hand')
                 : const Text('Ablage'),
         actions: [
           IconButton(
               onPressed: () async {
-                var result = await Navigator.push(context, MaterialPageRoute(builder: (context) {
+                _game = Game(Hand(), Ablage());
+                var preSetting = Settings.getInstance().isExpansion;
+                await Navigator.push(context, MaterialPageRoute(builder: (context) {
                   return const SettingsWidget();
                 }));
                 setState(() {
-                  // Global Settings have to be applied
+                  if (preSetting != Settings.getInstance().isExpansion) {
+                    _page = 1;
+                  }
                 });
               },
               icon: const Icon(Icons.settings))
@@ -85,7 +88,8 @@ class HandWidget extends State<FantastischeReiche> {
               'assets/handBorderless.svg',
               semanticsLabel: 'Hand',
               height: 25,
-              color: _page == 1 ? Theme.of(context).primaryColor : Theme.of(context).bottomAppBarTheme.color,
+              color:
+                  isHandPage() ? Theme.of(context).primaryColor : Theme.of(context).bottomAppBarTheme.color,
             ),
           ),
           if (Settings.getInstance().isExpansion)
@@ -105,7 +109,7 @@ class HandWidget extends State<FantastischeReiche> {
               duration: const Duration(milliseconds: 500), curve: Curves.easeOut)
         },
       ),
-      floatingActionButton: _page == 2 || _page == 1
+      floatingActionButton: _page == 2 || isHandPage()
           ? Column(mainAxisAlignment: MainAxisAlignment.end, children: [
               _buildScanButton(context),
               _buildAddButton(context),
@@ -254,7 +258,7 @@ class HandWidget extends State<FantastischeReiche> {
           }));
           if (result != null) {
             setState(() {
-              if (_page == 1) {
+              if (isHandPage()) {
                 _game.addCardsHandByID(result.toList());
               } else {
                 _game.addCardsAblageByID(result.toList());
@@ -274,14 +278,16 @@ class HandWidget extends State<FantastischeReiche> {
           context,
           MaterialPageRoute<List<game.Cards>>(builder: (context) {
             return CardSelector(
-              selector: (card) => !_game.cardsHand.map((card) => card.id).contains(card.id),
+              selector: isHandPage()
+                  ? (card) => !_game.cardsHand.map((card) => card.id).contains(card.id)
+                  : (card) => !_game.cardsAblage.map((e) => e.id).contains(card.id),
               multiselect: true,
             );
           }),
         );
         if (result != null && _game.lengthHand <= 8) {
           setState(() {
-            if (_page == 1) {
+            if (isHandPage()) {
               _game.addCardsHandByID(result);
             } else {
               _game.addCardsAblageByID(result);
@@ -291,6 +297,8 @@ class HandWidget extends State<FantastischeReiche> {
       },
     );
   }
+
+  bool isHandPage() => _page == 1;
 
   /// description of given card
   AnimatedOpacity _buildDescription(game.Card card) {
@@ -344,8 +352,11 @@ class HandWidget extends State<FantastischeReiche> {
                   padding: const EdgeInsets.all(0),
                   iconSize: 20,
                   onPressed: card.hasAction
-                      ? () {
-                          _game.executeAction(context, card);
+                      ? () async {
+                          await _game.executeAction(context, card);
+                          setState(() {
+                            // _game changed possibly
+                          });
                         }
                       : () {},
                   color: Colors.white,
@@ -369,7 +380,7 @@ class HandWidget extends State<FantastischeReiche> {
           // bonus - penalty
           flex: 1,
           child: Center(
-            child: Text('${_game.isVisibleHand(card) ? _game.bonus(card) - _game.penalty(card) : 0}',
+            child: Text('${_game.isActiveHand(card) ? _game.bonus(card) - _game.penalty(card) : 0}',
                 style: TextStyle(
                     color: _game.bonus(card) - _game.penalty(card) >= 0
                         ? _game.bonus(card) - _game.penalty(card) == 0

@@ -82,7 +82,7 @@ extension CardTypeExtension on CardType {
       case CardType.beast:
         return Colors.green;
       case CardType.building:
-        return Colors.deepOrange;
+        return const Color(0xff0b203f);
       case CardType.undead:
         return const Color(0xFF023A35);
       case CardType.outsider:
@@ -92,7 +92,7 @@ extension CardTypeExtension on CardType {
 
   /// Gives a Text Color to contrast with color
   Color get textColor {
-    return {CardType.army, CardType.leader, CardType.land, CardType.undead}.contains(this)
+    return {CardType.army, CardType.leader, CardType.land, CardType.undead, CardType.building}.contains(this)
         ? Colors.white
         : Colors.black;
   }
@@ -111,7 +111,7 @@ class Card implements Comparable<Card> {
   int Function(Game, Card tis) hbonus;
 
   // function has to be overwritten
-  void Function(Card tis, BuildContext, Game)? haction;
+  Future<void> Function(Card tis, BuildContext, Game)? haction;
 
   // Returns a penalty that is subtracted from the overall strength of the card
   int Function(Game, Card tis) hpenalty;
@@ -147,9 +147,9 @@ class Card implements Comparable<Card> {
     return baseStrength + bonus(game) - penalty(game);
   }
 
-  void executeAction(BuildContext context, Game game) {
+  Future<void> executeAction(BuildContext context, Game game) async {
     if (haction != null) {
-      haction!(this, context, game);
+      await haction!(this, context, game);
     }
   }
 

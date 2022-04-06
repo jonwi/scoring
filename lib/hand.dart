@@ -38,7 +38,9 @@ class Hand {
 
   void blockCard(Card card) {
     if (_cards.containsKey(card)) {
-      _cards[card]!.activationState = false;
+      if (_cards[card]!.activationState == null) {
+        _cards[card]!.activationState = false;
+      }
     }
   }
 

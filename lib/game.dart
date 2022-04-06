@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:hive/hive.dart';
+import 'package:scoring/settings.dart';
 
 import 'ablage.dart';
 import 'card.dart';
@@ -173,8 +174,11 @@ class Game {
 
   /// returns the number of cards that are allowed in the current hand
   int maxCardsHand() {
-    if (cardsHand.map((e) => e.id).contains(Cards.totenbeschwoerer)) return 8;
-    return 7;
+    int size = 7;
+    if (cardsHand.map((e) => e.id).contains(Cards.totenbeschwoerer)) size++;
+    if (Settings.getInstance().isExpansion) size++;
+    if (cardsHand.map((e) => e.id).contains(Cards.kobold)) size++;
+    return size;
   }
 
   static List<Game> games() {
@@ -186,8 +190,8 @@ class Game {
     return list;
   }
 
-  void executeAction(BuildContext context, Card card) {
-    card.executeAction(context, this);
+  Future<void> executeAction(BuildContext context, Card card) async {
+    await card.executeAction(context, this);
     calculateSum();
     save();
   }

@@ -384,7 +384,8 @@ class Deck {
           15,
           (game, tis) {},
           (game, tis) {
-            if (containsID(game.activeCards, Cards.waldlaeufer)) return 0;
+            if (containsID(game.activeCards, Cards.waldlaeufer) ||
+                containsID(game.activeCards, Cards.waldlaeuferNeu)) return 0;
             return amountOf(game.activeCards, {CardType.army}, ids: {tis.id}) * -2;
           },
           RichText(
@@ -624,7 +625,8 @@ class Deck {
           35,
           (game, tis) {
             for (var card in game.cardsHand) {
-              if (containsID(game.activeCards, Cards.waldlaeufer)) {
+              if (containsID(game.activeCards, Cards.waldlaeufer) ||
+                  containsID(game.activeCards, Cards.waldlaeuferNeu)) {
                 if ({CardType.beast, CardType.leader}.contains(card.cardType) && card.id != tis.id) {
                   game.blockCard(card);
                 }
@@ -930,7 +932,9 @@ class Deck {
           (game, tis) {
             var aDeck = game.activeCards;
 
-            if (containsID(aDeck, Cards.waldlaeufer) || containsID(aDeck, Cards.kriegsschiff)) {
+            if (containsID(aDeck, Cards.waldlaeufer) ||
+                containsID(aDeck, Cards.kriegsschiff) ||
+                containsID(game.activeCards, Cards.waldlaeuferNeu)) {
               return 3 * amountOf(aDeck, {CardType.flame});
             } else {
               return 3 * amountOf(aDeck, {CardType.flame, CardType.army});
@@ -947,7 +951,8 @@ class Deck {
             for (var card in game.cardsHand) {
               if (card.name != Cards.gebirge.cardName && card.name != Cards.blitz.cardName) {
                 if (containsID(game.activeCards, Cards.waldlaeufer) ||
-                    containsID(game.activeCards, Cards.kriegsschiff)) {
+                    containsID(game.activeCards, Cards.kriegsschiff) ||
+                    containsID(game.activeCards, Cards.waldlaeuferNeu)) {
                   if ({CardType.land, CardType.flame}.contains(card.cardType)) {
                     game.blockCard(card);
                   }
@@ -1430,8 +1435,7 @@ class Deck {
           false,
           35,
           (game, tis) {
-            if (!containsID(game.cardsHand, Cards.waldlaeufer) &&
-                (!deckContainsType(game, CardType.army) || deckContainsType(game, CardType.weather))) {
+            if (deckContainsType(game, CardType.weather) && !deckContainsType(game, CardType.army)) {
               game.blockCard(tis);
             }
           },
@@ -1511,7 +1515,8 @@ class Deck {
             const TextSpan(text: '.')
           ])),
           (game, tis) {
-            if (containsID(game.activeCards, Cards.waldlaeufer)) {
+            if (containsID(game.activeCards, Cards.waldlaeufer) ||
+                containsID(game.activeCards, Cards.waldlaeuferNeu)) {
               return amountOf(game.activeCards, {CardType.leader, CardType.beast, CardType.flame}) * 5;
             } else {
               return amountOf(
@@ -1812,7 +1817,9 @@ class Deck {
             }
           },
           (game, tis) {
-            return game.activeCards.fold(0, (p, el) => p + el.baseStrength);
+            return game.activeCards
+                .where((c) => c.cardType == CardType.undead)
+                .fold(0, (p, el) => p + el.baseStrength);
           },
           RichText(
               text: TextSpan(
@@ -2239,7 +2246,8 @@ class Deck {
             for (var card in game.cardsHand) {
               if (card.name != Cards.gebirge.cardName && card.name != Cards.blitz.cardName) {
                 if (containsID(game.activeCards, Cards.waldlaeufer) ||
-                    containsID(game.activeCards, Cards.kriegsschiff)) {
+                    containsID(game.activeCards, Cards.kriegsschiff) ||
+                    containsID(game.activeCards, Cards.waldlaeuferNeu)) {
                   if ({CardType.land, CardType.flame, CardType.building}.contains(card.cardType)) {
                     game.blockCard(card);
                   }
