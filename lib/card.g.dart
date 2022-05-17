@@ -161,6 +161,12 @@ class CardsAdapter extends TypeAdapter<Cards> {
         return Cards.engel;
       case 73:
         return Cards.lich;
+      case 74:
+        return Cards.richter;
+      case 75:
+        return Cards.verlies;
+      case 76:
+        return Cards.garten;
       default:
         return Cards.koenig;
     }
@@ -390,6 +396,15 @@ class CardsAdapter extends TypeAdapter<Cards> {
         break;
       case Cards.lich:
         writer.writeByte(73);
+        break;
+      case Cards.richter:
+        writer.writeByte(74);
+        break;
+      case Cards.verlies:
+        writer.writeByte(75);
+        break;
+      case Cards.garten:
+        writer.writeByte(76);
         break;
     }
   }
