@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:scoring/fantastische_reiche.dart';
+import 'package:scoring/settings.dart';
 
 import 'ablage.dart';
 import 'card.dart';
@@ -13,7 +14,9 @@ Future<void> main() async {
 
   await Hive.deleteBoxFromDisk('games');
 
+  // await Hive.deleteBoxFromDisk('settings');
   await Hive.openBox<Map<int, List<Cards>>>('games');
+  await Hive.openBox<Map<dynamic, dynamic>>('settings');
   runApp(const MyApp());
 }
 
@@ -28,7 +31,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.brown,
       ),
-      home: FantastischeReiche(game: Game(Hand(), Ablage(), true)),
+      home: FantastischeReiche(game: Game(Hand(), Ablage(), Settings.getInstance().isExpansion)),
     );
   }
 }

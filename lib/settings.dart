@@ -1,15 +1,37 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
 
 class Settings {
   static Settings? instance;
 
-  bool isExpansion;
+  bool _isExpansion;
 
-  Settings._(this.isExpansion);
+  bool get isExpansion => _isExpansion;
+
+  set isExpansion(bool isExpansion) {
+    _isExpansion = isExpansion;
+    _save();
+  }
+
+  Settings._(this._isExpansion);
 
   static Settings getInstance() {
-    instance ??= Settings._(true);
+    instance ??= _load();
     return instance!;
+  }
+
+  void _save() {
+    Map<dynamic, dynamic> result = {'isExpansion': isExpansion};
+    Hive.box<Map<dynamic, dynamic>>('settings').put('settings', result);
+  }
+
+  static Settings _load() {
+    var set = Hive.box<Map<dynamic, dynamic>>('settings').get('settings');
+    if (set == null) {
+      return Settings._(false);
+    }
+    return Settings._(set['isExpansion']!);
   }
 }
 
