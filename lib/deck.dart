@@ -27,6 +27,10 @@ class Deck {
   }
 
   bool deckContainsType(Game game, CardType type) {
+    return game.cardsHand.where((card) => card.cardType == type).isNotEmpty;
+  }
+
+  bool activeDeckContainsType(Game game, CardType type) {
     return game.activeCards.where((card) => card.cardType == type).isNotEmpty;
   }
 
@@ -2112,13 +2116,13 @@ class Deck {
           (game, tis) {},
           (game, tis) {
             int bonus = 0;
-            if (deckContainsType(game, CardType.army)) {
+            if (activeDeckContainsType(game, CardType.army)) {
               bonus += 10;
             }
-            if (deckContainsType(game, CardType.leader)) {
+            if (activeDeckContainsType(game, CardType.leader)) {
               bonus += 10;
             }
-            if (deckContainsType(game, CardType.land)) {
+            if (activeDeckContainsType(game, CardType.land)) {
               bonus += 10;
             }
             bonus += max(0, (amountOf(game.activeCards, {CardType.building}) - 1) * 5);
@@ -2233,7 +2237,8 @@ class Deck {
           8,
           (game, tis) {},
           (game, tis) {
-            if (deckContainsType(game, CardType.wizard) || deckContainsType(game, CardType.undead)) {
+            if (activeDeckContainsType(game, CardType.wizard) ||
+                activeDeckContainsType(game, CardType.undead)) {
               return 15;
             }
             return 0;
@@ -2574,13 +2579,13 @@ class Deck {
         (game, tis) {},
         (game, tis) {
           int bonus = 0;
-          if (deckContainsType(game, CardType.undead)) {
+          if (activeDeckContainsType(game, CardType.undead)) {
             bonus += 10;
           }
-          if (deckContainsType(game, CardType.beast)) {
+          if (activeDeckContainsType(game, CardType.beast)) {
             bonus += 10;
           }
-          if (deckContainsType(game, CardType.artifact)) {
+          if (activeDeckContainsType(game, CardType.artifact)) {
             bonus += 10;
           }
           bonus += max(0, (amountOf(game.activeCards, {CardType.undead}) - 1) * 5);

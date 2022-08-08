@@ -80,6 +80,7 @@ class Hand {
 }
 
 class CardState {
+  // if the card is active or blocked
   bool? activationState;
   // true if the card is collapsed
   bool visibility;
