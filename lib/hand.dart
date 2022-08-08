@@ -65,10 +65,13 @@ class Hand {
   }
 
   void reset(bool isExpansion) {
+    Map<Card, CardState> newCards = {};
     for (Card card in cards) {
       Card cop = Deck().cards(isExpansion).firstWhere((element) => element.id == card.id);
-      _cards[cop] = _cards.remove(card)!;
+      newCards[cop] = _cards[card]!;
     }
+    _cards.removeWhere((key, value) => true);
+    _cards.addAll(newCards);
   }
 
   void setUnblockable(Card card) {
@@ -78,6 +81,7 @@ class Hand {
 
 class CardState {
   bool? activationState;
+  // true if the card is collapsed
   bool visibility;
 
   CardState({this.visibility = false, this.activationState});

@@ -165,7 +165,13 @@ class HandWidget extends State<FantastischeReiche> {
         ),
         Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
           const Spacer(),
-          ElevatedButton(onPressed: () => _game.resetHand(), child: const Text('Aktionen rückgängig')),
+          ElevatedButton(
+              onPressed: () {
+                setState(() {
+                  _game.resetHand();
+                });
+              },
+              child: const Text('Aktionen rückgängig')),
           const Spacer(),
           ElevatedButton(
               onPressed: () {
