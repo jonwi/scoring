@@ -98,6 +98,20 @@ extension CardTypeExtension on CardType {
   }
 }
 
+Iterable<CardType> baseTypes = [
+  CardType.army,
+  CardType.artifact,
+  CardType.beast,
+  CardType.flame,
+  CardType.flood,
+  CardType.land,
+  CardType.leader,
+  CardType.weapon,
+  CardType.weather,
+  CardType.wild,
+  CardType.wizard
+];
+
 class Card implements Comparable<Card> {
   String name;
   bool hasAction;

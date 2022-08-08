@@ -557,7 +557,7 @@ class Deck {
             }));
             if (cardID != null) {
               final cardType = await Navigator.push(context, MaterialPageRoute<CardType>(builder: (context) {
-                return TypeSelector(selector: (type) => type != CardType.wild);
+                return TypeSelector(selector: (type) => baseTypes.contains(type) && type != CardType.wild);
               }));
               if (cardType != null) {
                 Card chosen = game.cardsHand.where((element) => element.id == cardID).first;
