@@ -1447,7 +1447,7 @@ class Deck {
           false,
           35,
           (game, tis) {
-            if (deckContainsType(game, CardType.weather) && !deckContainsType(game, CardType.army)) {
+            if (deckContainsType(game, CardType.weather) || !deckContainsType(game, CardType.army)) {
               game.blockCard(tis);
             }
           },
