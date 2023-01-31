@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -257,7 +259,9 @@ class HandWidget extends State<FantastischeReiche> {
         onPressed: () async {
           WidgetsFlutterBinding.ensureInitialized();
           final cameras = await availableCameras();
-          final firstCamera = cameras.first;
+          log('length ${cameras.length}');
+          log(cameras[0].toString());
+          final firstCamera = cameras[0];
           var result = await Navigator.push<Set<game.Cards>>(context, MaterialPageRoute(builder: (context) {
             return CameraScan(
               camera: firstCamera,

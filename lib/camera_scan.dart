@@ -24,13 +24,18 @@ class TakePictureScreenState extends State<CameraScan> {
   late CameraController _controller;
   late Future<void> _initializeControllerFuture;
   final Map<Cards, int> _cards = {};
-  final _textDetector = GoogleMlKit.vision.textDetector();
+  final _textDetector = GoogleMlKit.vision.textRecognizer();
 
   @override
   void initState() {
     super.initState();
     _controller = CameraController(widget.camera, ResolutionPreset.max, enableAudio: false);
-    _initializeControllerFuture = _controller.initialize();
+    _initializeControllerFuture = _controller.initialize().then((value) {
+      if (!mounted) {
+        return;
+      }
+      setState((){});
+    });
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
       DeviceOrientation.portraitDown,
@@ -54,18 +59,19 @@ class TakePictureScreenState extends State<CameraScan> {
             children: [const Text('Scanner'), Text('Anzahl: ${_cards.length}')]),
       ),
       body: Stack(alignment: Alignment.center, children: [
-        FutureBuilder(
-          future: _initializeControllerFuture,
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.done) {
-              return CameraPreview(_controller);
-            } else {
-              return const Center(
-                child: CircularProgressIndicator(),
-              );
-            }
-          },
-        ),
+        // FutureBuilder(
+        //   future: _initializeControllerFuture,
+        //   builder: (context, snapshot) {
+        //     if (snapshot.connectionState == ConnectionState.done) {
+        //       return CameraPreview(_controller);
+        //     } else {
+        //       return const Center(
+        //         child: CircularProgressIndicator(),
+        //       );
+        //     }
+        //   },
+        // ),
+        _controller.value.isInitialized ? CameraPreview(_controller) : const Center(child: CircularProgressIndicator()),
         ListView.builder(
             itemCount: _cards.length,
             itemBuilder: (context, index) {
@@ -147,7 +153,7 @@ class TakePictureScreenState extends State<CameraScan> {
       final cameraImage = await _controller.takePicture();
       final inputImage = InputImage.fromFilePath(cameraImage.path);
 
-      final RecognisedText recognisedText = await _textDetector.processImage(inputImage);
+      final RecognizedText recognisedText = await _textDetector.processImage(inputImage);
       List<String> foundCards = [];
       if (kDebugMode) {
         print(recognisedText.text);
