@@ -3,7 +3,7 @@ import 'package:scoring/hand.dart';
 import 'card.dart';
 
 class Ablage {
-  Map<Card, CardState> _cards = {};
+  final Map<Card, CardState> _cards = {};
 
   int get length {
     return cards.length;

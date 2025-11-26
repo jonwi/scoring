@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 
@@ -61,7 +60,7 @@ class SettingsState extends State<SettingsWidget> {
       body: CheckboxListTile(
         value: _isExpansion,
         onChanged: (val) => {
-          setState(() => {_isExpansion = !_isExpansion})
+          setState(() {_isExpansion = !_isExpansion;})
         },
         title: const Text('Erweiterung'),
       ),

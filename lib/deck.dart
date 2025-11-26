@@ -389,7 +389,9 @@ class Deck {
           (game, tis) {},
           (game, tis) {
             if (containsID(game.activeCards, Cards.waldlaeufer) ||
-                containsID(game.activeCards, Cards.waldlaeuferNeu)) return 0;
+                containsID(game.activeCards, Cards.waldlaeuferNeu)) {
+              return 0;
+            }
             return amountOf(game.activeCards, {CardType.army}, ids: {tis.id}) * -2;
           },
           RichText(

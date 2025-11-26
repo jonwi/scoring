@@ -204,7 +204,7 @@ class HandWidget extends State<FantastischeReiche> {
               background: Container(
                   alignment: AlignmentDirectional.centerEnd,
                   color: Colors.red,
-                  child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: const [
+                  child: const Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
                     Padding(
                         padding: EdgeInsets.only(left: 10), child: Icon(Icons.delete, color: Colors.white)),
                     Padding(
@@ -550,7 +550,7 @@ class HandWidget extends State<FantastischeReiche> {
                       background: Container(
                           alignment: AlignmentDirectional.centerEnd,
                           color: Colors.red,
-                          child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: const [
+                          child: const Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
                             Padding(
                                 padding: EdgeInsets.only(left: 10),
                                 child: Icon(Icons.delete, color: Colors.white)),

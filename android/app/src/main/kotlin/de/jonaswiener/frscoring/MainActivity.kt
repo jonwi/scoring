@@ -1,4 +1,4 @@
-package de.jonaswiener.scoring
+package de.jonaswiener.frscoring
 
 import io.flutter.embedding.android.FlutterActivity
 
