@@ -1,0 +1,57 @@
+name: Create Release with Unsigned APK
+
+on:
+  # Trigger on pushing a tag (e.g., v1.0.0)
+  push:
+    tags:
+      - "v*"
+  # Allow manual trigger from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build & Release
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Checkout the repository
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # 2. Setup Java (Required for Android builds)
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      # 3. Setup Flutter
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          # Optional: Specify a version if needed
+          # flutter-version: '3.19.0'
+
+      # 4. Install Dependencies
+      - name: Get Dependencies
+        run: flutter pub get
+
+      # 5. Build the APK (Release Mode)
+      # By default, this creates 'app-release.apk'.
+      # If you haven't configured signing in build.gradle, this will be unsigned
+      # or signed with a debug key (depending on your project template).
+      - name: Build APK
+        run: flutter build apk --release
+
+      # 6. Create GitHub Release and Upload Artifact
+      - name: Create Release
+        uses: ncipollo/release-action@v1
+        with:
+          artifacts: "build/app/outputs/flutter-apk/app-release.apk"
+          token: ${{ secrets.GITHUB_TOKEN }}
+          tag: ${{ github.ref_name }}
+          name: "Release ${{ github.ref_name }}"
+          body: "Automated release of ${{ github.ref_name }}"
+          allowUpdates: true
+          generateReleaseNotes: true
