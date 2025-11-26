@@ -25,99 +25,105 @@ class FantastischeReiche extends StatefulWidget {
 }
 
 class HandWidget extends State<FantastischeReiche> {
-  @override
-  void initState() {
-    _game = widget.game;
-    _pageController = PageController(initialPage: _page);
-    super.initState();
-  }
-
-  /// Card and Active State where true means the card counts towards total and false means its deactivated and visibility
   late Game _game;
-
   late PageController _pageController;
 
-  int _page = 1;
+  @override
+  void initState() {
+    super.initState();
+    _game = widget.game;
+    _pageController = PageController(initialPage: 1);
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: _page == 0
-            ? const Text('Historie')
-            : isHandPage()
-                ? const Text('Hand')
-                : const Text('Ablage'),
-        actions: [
-          IconButton(
-              onPressed: () async {
-                bool? result = await Navigator.push<bool>(context, MaterialPageRoute(builder: (context) {
-                  return const SettingsWidget();
-                }));
-                setState(() {
-                  if (result != null) {
-                    if (Settings.getInstance().isExpansion != result) {
-                      _page = 1;
-                      Settings.getInstance().isExpansion = result;
-                      _game = Game(Hand(), Ablage(), Settings.getInstance().isExpansion);
+    return AnimatedBuilder(
+      animation: _pageController,
+      builder: (context, child) {
+        final int page = _pageController.hasClients && _pageController.page != null
+            ? _pageController.page!.round()
+            : _pageController.initialPage;
+
+        final bool isHand = page == 1;
+
+        return Scaffold(
+          appBar: AppBar(
+            title: page == 0
+                ? const Text('Historie')
+                : isHand
+                    ? const Text('Hand')
+                    : const Text('Ablage'),
+            actions: [
+              IconButton(
+                  onPressed: () async {
+                    bool? result = await Navigator.push<bool>(context, MaterialPageRoute(builder: (context) {
+                      return const SettingsWidget();
+                    }));
+                    if (result != null && Settings.getInstance().isExpansion != result) {
+                      setState(() {
+                        _pageController.jumpToPage(1);
+                        Settings.getInstance().isExpansion = result!;
+                        _game = Game(Hand(), Ablage(), Settings.getInstance().isExpansion);
+                      });
                     }
-                  }
-                });
-              },
-              icon: const Icon(Icons.settings))
-        ],
-      ),
-      body: PageView(
-        clipBehavior: Clip.none,
+                  },
+                  icon: const Icon(Icons.settings))
+            ],
+          ),
+          body: child,
+          bottomNavigationBar: BottomNavigationBar(
+            currentIndex: page,
+            items: [
+              const BottomNavigationBarItem(icon: Icon(Icons.history), label: 'Historie'),
+              BottomNavigationBarItem(
+                label: 'Hand',
+                icon: SvgPicture.asset(
+                  'assets/handBorderless.svg',
+                  semanticsLabel: 'Hand',
+                  height: 25,
+                  color: isHand ? Theme.of(context).primaryColor : Theme.of(context).bottomAppBarTheme.color,
+                ),
+              ),
+              if (_game.isExpansion)
+                BottomNavigationBarItem(
+                  label: 'Ablage',
+                  icon: SvgPicture.asset(
+                    'assets/ablagenorm.svg',
+                    semanticsLabel: 'Ablage',
+                    height: 25,
+                    color: page == 2
+                        ? Theme.of(context).primaryColor
+                        : Theme.of(context).bottomAppBarTheme.color,
+                  ),
+                )
+            ],
+            onTap: (index) => _pageController.animateToPage(index,
+                duration: const Duration(milliseconds: 500), curve: Curves.easeOut),
+          ),
+          floatingActionButton: page == 2 || isHand
+              ? Column(mainAxisAlignment: MainAxisAlignment.end, children: [
+                  _buildScanButton(context),
+                  const SizedBox(height: 16),
+                  _buildAddButton(context),
+                  const SizedBox(height: 25 + 16),
+                ])
+              : null,
+        );
+      },
+      child: PageView(
         controller: _pageController,
-        onPageChanged: (newPage) {
-          setState(() {
-            _page = newPage;
-          });
-        },
         children: [
           _buildHistory(context),
           _buildHand(),
           if (_game.isExpansion) _buildAblage(),
         ],
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _page,
-        items: [
-          const BottomNavigationBarItem(icon: Icon(Icons.history), label: 'Historie'),
-          BottomNavigationBarItem(
-            label: 'Hand',
-            icon: SvgPicture.asset(
-              'assets/handBorderless.svg',
-              semanticsLabel: 'Hand',
-              height: 25,
-              color:
-                  isHandPage() ? Theme.of(context).primaryColor : Theme.of(context).bottomAppBarTheme.color,
-            ),
-          ),
-          if (_game.isExpansion)
-            BottomNavigationBarItem(
-              label: 'Ablage',
-              icon: SvgPicture.asset(
-                'assets/ablagenorm.svg',
-                semanticsLabel: 'Ablage',
-                height: 25,
-                color:
-                    _page == 2 ? Theme.of(context).primaryColor : Theme.of(context).bottomAppBarTheme.color,
-              ),
-            )
-        ],
-        onTap: (index) => {
-          _pageController.animateToPage(index,
-              duration: const Duration(milliseconds: 500), curve: Curves.easeOut)
-        },
-      ),
-      floatingActionButton: _page == 2 || isHandPage()
-          ? Column(mainAxisAlignment: MainAxisAlignment.end, children: [
-              _buildScanButton(context),
-              _buildAddButton(context),
-            ])
-          : null,
     );
   }
 
@@ -153,16 +159,39 @@ class HandWidget extends State<FantastischeReiche> {
           ),
         ),
         Expanded(
-          child: SingleChildScrollView(
-            child: ExpansionPanelList(
-              key: Key('${_game.lengthHand}'),
-              children: _game.cardsHand.map<ExpansionPanel>((card) => cardHandPanel(card)).toList(),
-              expansionCallback: (index, isActive) {
-                setState(() {
-                  _game.setVisibleHand(_game.cardsHand.elementAt(index), !isActive);
-                });
-              },
-            ),
+          child: ListView.builder(
+            itemCount: _game.cardsHand.length,
+            itemBuilder: (context, index) {
+              final card = _game.cardsHand.elementAt(index);
+              return Dismissible(
+                key: Key(card.id.name),
+                onDismissed: (direction) {
+                  setState(() {
+                    _game.removeCardHand(card);
+                  });
+                },
+                background: Container(
+                    alignment: AlignmentDirectional.centerEnd,
+                    color: Colors.red,
+                    child: const Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+                      Padding(
+                          padding: EdgeInsets.only(left: 10), child: Icon(Icons.delete, color: Colors.white)),
+                      Padding(
+                          padding: EdgeInsets.only(right: 10), child: Icon(Icons.delete, color: Colors.white))
+                    ])),
+                child: ExpansionTile(
+                  key: PageStorageKey(card.id.name),
+                  title: _buildStats(card),
+                  initiallyExpanded: _game.isVisibleHand(card),
+                  onExpansionChanged: (isExpanded) {
+                    setState(() {
+                      _game.setVisibleHand(card, isExpanded);
+                    });
+                  },
+                  children: <Widget>[_buildDescription(card)],
+                ),
+              );
+            },
           ),
         ),
         Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
@@ -188,32 +217,6 @@ class HandWidget extends State<FantastischeReiche> {
         ])
       ],
     );
-  }
-
-  ExpansionPanel cardHandPanel(game.Card card) {
-    return ExpansionPanel(
-        headerBuilder: (BuildContext context, bool isExpanded) {
-          return Dismissible(
-              key: Key(card.id.name),
-              child: _buildStats(card),
-              onDismissed: (direction) {
-                setState(() {
-                  _game.removeCardHand(card);
-                });
-              },
-              background: Container(
-                  alignment: AlignmentDirectional.centerEnd,
-                  color: Colors.red,
-                  child: const Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                    Padding(
-                        padding: EdgeInsets.only(left: 10), child: Icon(Icons.delete, color: Colors.white)),
-                    Padding(
-                        padding: EdgeInsets.only(right: 10), child: Icon(Icons.delete, color: Colors.white))
-                  ])));
-        },
-        body: _buildDescription(card),
-        canTapOnHeader: true,
-        isExpanded: _game.isVisibleHand(card));
   }
 
   ListView _buildHistory(BuildContext context) {
@@ -270,7 +273,7 @@ class HandWidget extends State<FantastischeReiche> {
           }));
           if (result != null) {
             setState(() {
-              if (isHandPage()) {
+              if (_pageController.page!.round() == 1) {
                 _game.addCardsHandByID(result.toList());
               } else {
                 _game.addCardsAblageByID(result.toList());
@@ -290,7 +293,7 @@ class HandWidget extends State<FantastischeReiche> {
           context,
           MaterialPageRoute<List<game.Cards>>(builder: (context) {
             return CardSelector(
-              selector: isHandPage()
+              selector: _pageController.page!.round() == 1
                   ? (card) => !_game.cardsHand.map((card) => card.id).contains(card.id)
                   : (card) => !_game.cardsAblage.map((e) => e.id).contains(card.id),
               multiselect: true,
@@ -300,7 +303,7 @@ class HandWidget extends State<FantastischeReiche> {
         );
         if (result != null && _game.lengthHand <= 8) {
           setState(() {
-            if (isHandPage()) {
+            if (_pageController.page!.round() == 1) {
               _game.addCardsHandByID(result);
             } else {
               _game.addCardsAblageByID(result);
@@ -311,20 +314,13 @@ class HandWidget extends State<FantastischeReiche> {
     );
   }
 
-  bool isHandPage() => _page == 1;
-
   /// description of given card
-  AnimatedOpacity _buildDescription(game.Card card) {
-    return AnimatedOpacity(
-        opacity: _game.isVisibleHand(card) ? 1.0 : 0,
-        duration: const Duration(milliseconds: 500),
-        child: Visibility(
-            visible: _game.isVisibleHand(card),
-            child: Row(children: [
-              const Spacer(),
-              Expanded(flex: 5, child: Wrap(children: [Center(child: card.description)])),
-              const Spacer(),
-            ])));
+  Widget _buildDescription(game.Card card) {
+    return Row(children: [
+      const Spacer(),
+      Expanded(flex: 5, child: Wrap(children: [Center(child: card.description)])),
+      const Spacer(),
+    ]);
   }
 
   /// Stats containing base strength, name, actionButton, bonus and penalty, and overall total
@@ -341,7 +337,7 @@ class HandWidget extends State<FantastischeReiche> {
               color: card.cardType.color,
             ),
             child: SizedBox(
-              width: 20,
+              width: 35,
               child: Center(
                 child: Text(
                   '${card.baseStrength}',
@@ -493,82 +489,69 @@ class HandWidget extends State<FantastischeReiche> {
   }
 
   Widget _buildAblage() {
-    return SingleChildScrollView(
-      child: ExpansionPanelList(
-        children: _game.cardsAblage
-            .map((card) => ExpansionPanel(
-                headerBuilder: (BuildContext context, bool isExpanded) {
-                  return Dismissible(
-                      key: Key(card.id.name),
-                      child: Row(
-                        children: [
-                          Container(
-                              // baseStrength
-                              margin: const EdgeInsets.all(15),
-                              decoration: BoxDecoration(
-                                boxShadow: [BoxShadow(color: card.cardType.color, spreadRadius: 10)],
-                                borderRadius: BorderRadius.circular(16),
-                                color: card.cardType.color,
-                              ),
-                              child: SizedBox(
-                                width: 20,
-                                child: Center(
-                                  child: Text(
-                                    '${card.baseStrength}',
-                                    style: TextStyle(
-                                      color: card.cardType.textColor,
-                                    ),
-                                  ),
-                                ),
-                              )),
-                          Expanded(
-                              // name
-                              flex: 5,
-                              child: Text(
-                                card.name,
-                              )),
-                          FittedBox(
-                            child: IconButton(
-                              icon: const Icon(
-                                Icons.delete,
-                                color: Colors.red,
-                              ),
-                              onPressed: () {
-                                setState(() {
-                                  _game.removeCardAblage(card);
-                                });
-                              },
-                            ),
+    return ListView.builder(
+      itemCount: _game.cardsAblage.length,
+      itemBuilder: (context, index) {
+        final card = _game.cardsAblage.elementAt(index);
+        return Dismissible(
+          key: Key(card.id.name),
+          onDismissed: (direction) {
+            setState(() {
+              _game.removeCardAblage(card);
+            });
+          },
+          background: Container(
+              alignment: AlignmentDirectional.centerEnd,
+              color: Colors.red,
+              child: const Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+                Padding(padding: EdgeInsets.only(left: 10), child: Icon(Icons.delete, color: Colors.white)),
+                Padding(padding: EdgeInsets.only(right: 10), child: Icon(Icons.delete, color: Colors.white))
+              ])),
+          child: ExpansionTile(
+            key: PageStorageKey(card.id.name),
+            title: Row(
+              children: [
+                Container(
+                    margin: const EdgeInsets.all(15),
+                    decoration: BoxDecoration(
+                      boxShadow: [BoxShadow(color: card.cardType.color, spreadRadius: 10)],
+                      borderRadius: BorderRadius.circular(16),
+                      color: card.cardType.color,
+                    ),
+                    child: SizedBox(
+                      width: 35,
+                      child: Center(
+                        child: Text(
+                          '${card.baseStrength}',
+                          style: TextStyle(
+                            color: card.cardType.textColor,
                           ),
-                        ],
+                        ),
                       ),
-                      onDismissed: (direction) {
-                        setState(() {
-                          _game.removeCardAblage(card);
-                        });
-                      },
-                      background: Container(
-                          alignment: AlignmentDirectional.centerEnd,
-                          color: Colors.red,
-                          child: const Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                            Padding(
-                                padding: EdgeInsets.only(left: 10),
-                                child: Icon(Icons.delete, color: Colors.white)),
-                            Padding(
-                                padding: EdgeInsets.only(right: 10),
-                                child: Icon(Icons.delete, color: Colors.white))
-                          ])));
-                },
-                body: _buildDescription(card),
-                canTapOnHeader: true,
-                isExpanded: _game.isVisibleAblage(card)))
-            .toList(),
-        expansionCallback: (index, isActive) {
-          setState(() {
-            _game.setVisibleAblage(_game.cardsHand.elementAt(index), !isActive);
-          });
-        },
-      ),
+                    )),
+                Expanded(flex: 5, child: Text(card.name)),
+                FittedBox(
+                  child: IconButton(
+                    icon: const Icon(Icons.delete, color: Colors.red),
+                    onPressed: () {
+                      setState(() {
+                        _game.removeCardAblage(card);
+                      });
+                    },
+                  ),
+                ),
+              ],
+            ),
+            initiallyExpanded: _game.isVisibleAblage(card),
+            onExpansionChanged: (isExpanded) {
+              setState(() {
+                _game.setVisibleAblage(card, isExpanded);
+              });
+            },
+            children: <Widget>[_buildDescription(card)],
+          ),
+        );
+      },
     );
   }
 }

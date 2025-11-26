@@ -20,19 +20,18 @@ class CardSelectorState extends State<CardSelector> {
   late List<game.Card> _filtered;
   late final Map<game.Card, bool> _expanded = {};
   late final Map<game.Card, bool> _selected = {};
+  bool _isMultiSelectActive = false;
 
   @override
   void initState() {
+    super.initState();
     _filtered = widget.selector != null
         ? Deck().cards(widget.isExpansion).where(widget.selector!).toList()
         : Deck().cards(widget.isExpansion).toList();
     for (var card in _filtered) {
       _expanded[card] = false;
-    }
-    for (var card in _filtered) {
       _selected[card] = false;
     }
-    super.initState();
   }
 
   @override
@@ -100,7 +99,13 @@ class CardSelectorState extends State<CardSelector> {
             ),
             onTap: () {
               if (widget.multiselect) {
-                Navigator.pop<List<game.Cards>>(context, [card.id]);
+                if (_isMultiSelectActive) {
+                  setState(() {
+                    _selected[card] = !_selected[card]!;
+                  });
+                } else {
+                  Navigator.pop<List<game.Cards>>(context, [card.id]);
+                }
               } else {
                 Navigator.pop<game.Cards>(context, card.id);
               }
@@ -108,6 +113,7 @@ class CardSelectorState extends State<CardSelector> {
             onLongPress: () {
               if (widget.multiselect) {
                 setState(() {
+                  _isMultiSelectActive = true;
                   _selected[card] = !_selected[card]!;
                 });
               }
@@ -115,7 +121,7 @@ class CardSelectorState extends State<CardSelector> {
           );
         }).toList(),
       ),
-      floatingActionButton: widget.multiselect
+      floatingActionButton: widget.multiselect && _isMultiSelectActive
           ? FloatingActionButton(
               child: const Icon(Icons.check),
               backgroundColor:
