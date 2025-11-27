@@ -29,11 +29,15 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  flutter_web_plugins:
+    sdk: flutter
   camera:
+  camera_web:
   path_provider:
   path:
   google_mlkit_text_recognition:
   image_picker:
+  image_picker_for_web:
   string_similarity:
   hive:
   hive_flutter:

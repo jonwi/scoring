@@ -557,7 +557,7 @@ class Deck {
                 isExpansion: game.isExpansion,
               );
             }));
-            if (cardID != null) {
+            if (cardID != null && context.mounted) {
               final cardType = await Navigator.push(context, MaterialPageRoute<CardType>(builder: (context) {
                 return TypeSelector(selector: (type) => baseTypes.contains(type) && type != CardType.wild);
               }));

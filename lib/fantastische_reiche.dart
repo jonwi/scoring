@@ -266,6 +266,7 @@ class HandWidget extends State<FantastischeReiche> {
         onPressed: () async {
           WidgetsFlutterBinding.ensureInitialized();
           final cameras = await availableCameras();
+          if (!context.mounted) return;
           log('length ${cameras.length}');
           log(cameras[0].toString());
           final firstCamera = cameras[0];
@@ -293,6 +294,7 @@ class HandWidget extends State<FantastischeReiche> {
       heroTag: 'btn2',
       child: const Icon(Icons.add),
       onPressed: () async {
+        if (!mounted) return;
         final result = await Navigator.push(
           context,
           MaterialPageRoute<List<game.Cards>>(builder: (context) {
