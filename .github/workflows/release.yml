@@ -37,14 +37,18 @@ jobs:
       - name: Get Dependencies
         run: flutter pub get
 
-      # 5. Build the APK (Release Mode)
+      # 5. Disable APK Signing
+      - name: Disable APK Signing
+        run: sed -i.bak 's/signingConfig signingConfigs.release/\/\/signingConfig signingConfigs.release/g' android/app/build.gradle
+
+      # 6. Build the APK (Release Mode)
       # By default, this creates 'app-release.apk'.
       # If you haven't configured signing in build.gradle, this will be unsigned
       # or signed with a debug key (depending on your project template).
       - name: Build APK
         run: flutter build apk --release
 
-      # 6. Create GitHub Release and Upload Artifact
+      # 7. Create GitHub Release and Upload Artifact
       - name: Create Release
         uses: ncipollo/release-action@v1
         with:
