@@ -53,11 +53,15 @@ jobs:
       - name: Build APK
         run: flutter build apk --release
 
-      # 7. Create GitHub Release and Upload Artifact
+      # 7. Rename APK
+      - name: Rename APK
+        run: mv build/app/outputs/flutter-apk/app-release.apk build/app/outputs/flutter-apk/frscoring-release.apk
+
+      # 8. Create GitHub Release and Upload Artifact
       - name: Create Release
         uses: ncipollo/release-action@v1
         with:
-          artifacts: "build/app/outputs/flutter-apk/app-release.apk"
+          artifacts: "build/app/outputs/flutter-apk/frscoring-release.apk"
           token: ${{ secrets.GITHUB_TOKEN }}
           tag: ${{ github.ref_name }}
           name: "Release ${{ github.ref_name }}"
