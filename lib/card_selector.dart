@@ -123,7 +123,6 @@ class CardSelectorState extends State<CardSelector> {
       ),
       floatingActionButton: widget.multiselect && _isMultiSelectActive
           ? FloatingActionButton(
-              child: const Icon(Icons.check),
               backgroundColor:
                   _selected.values.fold<bool>(false, (previousValue, element) => previousValue || element)
                       ? null
@@ -133,6 +132,7 @@ class CardSelectorState extends State<CardSelector> {
                     _selected.entries.where((element) => element.value).map((e) => e.key.id).toList();
                 Navigator.pop<List<game.Cards>>(context, result);
               },
+              child: const Icon(Icons.check),
             )
           : null,
     );
