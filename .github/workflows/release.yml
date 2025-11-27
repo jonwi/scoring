@@ -1,4 +1,4 @@
-name: Create Release with Unsigned APK
+name: Create Release with Debug Signed APK
 
 on:
   # Trigger on pushing a tag (e.g., v1.0.0)
@@ -40,9 +40,11 @@ jobs:
       - name: Get Dependencies
         run: flutter pub get
 
-      # 5. Disable APK Signing
-      - name: Disable APK Signing
-        run: sed -i.bak 's/signingConfig signingConfigs.release/\/\/signingConfig signingConfigs.release/g' android/app/build.gradle
+      # 5. Sign APK with debug key
+      - name: Sign APK with debug key
+        run: |
+          sed -i.bak 's/signingConfig signingConfigs.release/\/\/signingConfig signingConfigs.release/g' android/app/build.gradle
+          sed -i 's/\/\/signingConfig signingConfigs.debug/signingConfig signingConfigs.debug/g' android/app/build.gradle
 
       # 6. Build the APK (Release Mode)
       # By default, this creates 'app-release.apk'.
