@@ -2,7 +2,7 @@ import 'package:camera/camera.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:google_ml_kit/google_ml_kit.dart';
+import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 import 'package:string_similarity/string_similarity.dart';
 
 import 'card.dart';
@@ -24,7 +24,7 @@ class TakePictureScreenState extends State<CameraScan> {
   late CameraController _controller;
   late Future<void> _initializeControllerFuture;
   final Map<Cards, int> _cards = {};
-  final _textDetector = GoogleMlKit.vision.textRecognizer();
+  final _textRecognizer = TextRecognizer(script: TextRecognitionScript.latin);
 
   @override
   void initState() {
@@ -45,7 +45,7 @@ class TakePictureScreenState extends State<CameraScan> {
   @override
   void dispose() {
     _controller.dispose();
-    _textDetector.close();
+    _textRecognizer.close();
     SystemChrome.setPreferredOrientations([]);
     super.dispose();
   }
@@ -153,7 +153,7 @@ class TakePictureScreenState extends State<CameraScan> {
       final cameraImage = await _controller.takePicture();
       final inputImage = InputImage.fromFilePath(cameraImage.path);
 
-      final RecognizedText recognisedText = await _textDetector.processImage(inputImage);
+      final RecognizedText recognisedText = await _textRecognizer.processImage(inputImage);
       List<String> foundCards = [];
       if (kDebugMode) {
         print(recognisedText.text);

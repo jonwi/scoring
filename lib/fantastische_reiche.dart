@@ -68,7 +68,7 @@ class HandWidget extends State<FantastischeReiche> {
                     if (result != null && Settings.getInstance().isExpansion != result) {
                       setState(() {
                         _pageController.jumpToPage(1);
-                        Settings.getInstance().isExpansion = result!;
+                        Settings.getInstance().isExpansion = result;
                         _game = Game(Hand(), Ablage(), Settings.getInstance().isExpansion);
                       });
                     }
@@ -87,7 +87,9 @@ class HandWidget extends State<FantastischeReiche> {
                   'assets/handBorderless.svg',
                   semanticsLabel: 'Hand',
                   height: 25,
-                  color: isHand ? Theme.of(context).primaryColor : Theme.of(context).bottomAppBarTheme.color,
+                  colorFilter: ColorFilter.mode(
+                      isHand ? Theme.of(context).primaryColor : Theme.of(context).bottomAppBarTheme.color ?? Colors.grey,
+                      BlendMode.srcIn),
                 ),
               ),
               if (_game.isExpansion)
@@ -97,9 +99,11 @@ class HandWidget extends State<FantastischeReiche> {
                     'assets/ablagenorm.svg',
                     semanticsLabel: 'Ablage',
                     height: 25,
-                    color: page == 2
-                        ? Theme.of(context).primaryColor
-                        : Theme.of(context).bottomAppBarTheme.color,
+                    colorFilter: ColorFilter.mode(
+                        page == 2
+                            ? Theme.of(context).primaryColor
+                            : Theme.of(context).bottomAppBarTheme.color ?? Colors.grey,
+                        BlendMode.srcIn),
                   ),
                 )
             ],
